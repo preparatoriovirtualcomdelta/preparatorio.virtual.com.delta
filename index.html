@@ -1,68 +1,60 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-<meta charset="UTF-8">
-<title>PREPARATÓRIO VIRTUAL COM DELT∆</title>
-
-<style>
-body {
-  font-family: Arial;
-  background: #f2f2f2;
-  text-align: center;
-}
-
-.container {
-  background: white;
-  width: 80%;
-  margin: auto;
-  padding: 20px;
-  border-radius: 10px;
-  margin-top: 50px;
-  box-shadow: 0px 0px 10px #aaa;
-}
-
-input, select {
-  padding: 10px;
-  width: 80%;
-  margin: 10px;
-}
-
-button {
-  padding: 10px 20px;
-  background: black;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-<input id="nome">
-<input id="senha">
-<button onclick="login()">Entrar</button></style>
-
+  <meta charset="UTF-8">
+  <title>PREPARATÓRIO VIRTUAL COM DELT∆</title>
 </head>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+
+<body style="font-family: Arial; text-align:center;">
+
+<h1>PREPARATÓRIO VIRTUAL COM DELT∆</h1>
+
+<h2>Valor: 5.000 KZ</h2>
+
+<p>IBAN: 0040 0000 5071 2010 1017 8</p>
+
+<hr>
+
+<input id="email" placeholder="Email"><br><br>
+<input id="password" type="password" placeholder="Senha"><br><br>
+
+<button onclick="login()">Entrar</button>
+
+<p id="msg"></p>
+
+<!-- FIREBASE (VERSÃO COMPATÍVEL) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
 <script>
-const firebaseConfig = {
-  apiKey: "// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+  const firebaseConfig = {
+    apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
+    authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
+    projectId: "preparatoriovirtualcomdelta",
+    storageBucket: "preparatoriovirtualcomdelta.firebasestorage.app",
+    messagingSenderId: "554101533814",
+    appId: "1:554101533814:web:ed46583d92f4e14679c357"
+  };
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
-  authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
-  projectId: "preparatoriovirtualcomdelta",
-  storageBucket: "preparatoriovirtualcomdelta.firebasestorage.app",
-  messagingSenderId: "554101533814",
-  appId: "1:554101533814:web:ed46583d92f4e14679c357"
-};
+  firebase.initializeApp(firebaseConfig);
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);",
-  authDomain: "AQUI",
-  projectId: "AQUI",
-  appId: "AQUI"
-};
+  const auth = firebase.auth();
+
+  function login() {
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
+
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => {
+        document.getElementById("msg").innerText = "Acesso permitido ✔";
+        window.location.href = "home.html";
+      })
+      .catch((error) => {
+        document.getElementById("msg").innerText = "Erro: " + error.message;
+      });
+  }
+</script>
+
+</body>
+</html>
 
