@@ -22,10 +22,11 @@
 
 <p id="msg"></p>
 
-<!-- FIREBASE (VERSÃO COMPATÍVEL) -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
@@ -38,29 +39,27 @@
 
   firebase.initializeApp(firebaseConfig);
 
-  const auth = firebase.auth();
-<script>
-const db = firebase.firestore();
+  const db = firebase.firestore();
 
-function login() {
+  function login() {
 
-  let email = document.getElementById("email").value;
+    let email = document.getElementById("email").value;
 
-  db.collection("pedidos").add({
-    email: email,
-    estado: "pendente"
-  })
-  .then(() => {
-    document.getElementById("msg").innerText = "Pedido enviado ⏳ Aguarde aprovação";
-  })
-  .catch((error) => {
-    document.getElementById("msg").innerText = "Erro: " + error.message;
-  });
+    db.collection("pedidos").add({
+      email: email,
+      estado: "pendente"
+    })
+    .then(() => {
+      document.getElementById("msg").innerText =
+        "Pedido enviado ⏳ Aguarde aprovação";
+    })
+    .catch((error) => {
+      document.getElementById("msg").innerText =
+        "Erro: " + error.message;
+    });
 
-}
-</script>
   }
 </script>
+
 </body>
 </html>
-
