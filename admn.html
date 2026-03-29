@@ -2,34 +2,34 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<title>Admin DELT∆</title>
+<title>Admin DELTA</title>
 
 <style>
 body{
   font-family:Arial;
+  background:#f4f4f4;
   text-align:center;
-  background:#f1f5f9;
 }
 
 h1{
   margin-top:20px;
 }
 
-button{
-  padding:10px;
-  margin:5px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-}
-
 .card{
   background:white;
-  margin:15px auto;
   padding:15px;
+  margin:15px auto;
   width:80%;
   border-radius:10px;
-  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+  box-shadow:0 5px 10px rgba(0,0,0,0.1);
+}
+
+button{
+  padding:8px;
+  margin:5px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
 }
 
 .aprovar{
@@ -37,17 +37,14 @@ button{
   color:white;
 }
 
-.aprovar:hover{
-  background:#16a34a;
+.rejeitar{
+  background:red;
+  color:white;
 }
 
 .filtro{
   background:#0f172a;
   color:white;
-}
-
-.filtro:hover{
-  background:#1e293b;
 }
 </style>
 
@@ -55,83 +52,97 @@ button{
 
 <body>
 
-<h1>👨‍💼 Painel Admin DELT∆</h1>
+<h1>👨‍💼 ADMIN - DELTA</h1>
 
-<!-- FILTROS -->
 <button class="filtro" onclick="loadAll()">Todos</button>
 <button class="filtro" onclick="loadPendentes()">Pendentes</button>
 <button class="filtro" onclick="loadAprovados()">Aprovados</button>
 
 <div id="users"></div>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script type="module">
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
-  authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
-  projectId: "preparatoriovirtualcomdelta",
-  storageBucket: "preparatoriovirtualcomdelta.firebasestorage.app",
-  messagingSenderId: "554101533814",
-  appId: "1:554101533814:web:ed46583d92f4e14679c357"
-};
+import { db } from "./firebase.js";
 
-firebase.initializeApp(firebaseConfig);
+import {
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  query,
+  where
+} from "firebase/firestore";
 
-const db = firebase.firestore();
+const container = document.getElementById("users");
 
-// MOSTRAR USUÁRIOS
 function render(snapshot){
+
   let html = "";
 
-  snapshot.forEach(doc=>{
-    let u = doc.data();
+  snapshot.forEach(docSnap => {
+
+    let u = docSnap.data();
+    let id = docSnap.id;
 
     html += `
     <div class="card">
       <p><b>Email:</b> ${u.email}</p>
       <p><b>Estado:</b> ${u.estado}</p>
 
-      ${u.comprovativo 
+      ${
+        u.comprovativo
         ? `<a href="${u.comprovativo}" target="_blank">📄 Ver comprovativo</a><br><br>`
-        : `<p style="color:red;">Sem comprovativo</p>`}
+        : `<p style="color:red;">Sem comprovativo</p>`
+      }
 
-      <button class="aprovar" onclick="aprovar('${doc.id}')">✔ Aprovar</button>
+      <button class="aprovar" onclick="aprovar('${id}')">✔ Aprovar</button>
+      <button class="rejeitar" onclick="rejeitar('${id}')">❌ Bloquear</button>
     </div>
     `;
   });
 
-  document.getElementById("users").innerHTML = html;
+  container.innerHTML = html;
 }
 
 // TODOS
-function loadAll(){
-  db.collection("users").get().then(render);
+window.loadAll = async function(){
+  const snap = await getDocs(collection(db, "users"));
+  render(snap);
 }
 
 // PENDENTES
-function loadPendentes(){
-  db.collection("users").where("estado","==","pendente").get().then(render);
+window.loadPendentes = async function(){
+  const q = query(collection(db, "users"), where("estado","==","pendente"));
+  const snap = await getDocs(q);
+  render(snap);
 }
 
 // APROVADOS
-function loadAprovados(){
-  db.collection("users").where("estado","==","aprovado").get().then(render);
+window.loadAprovados = async function(){
+  const q = query(collection(db, "users"), where("estado","==","aprovado"));
+  const snap = await getDocs(q);
+  render(snap);
 }
 
 // APROVAR
-function aprovar(id){
-  db.collection("users").doc(id).update({
-    estado:"aprovado"
-  }).then(()=>{
-    loadAll();
+window.aprovar = async function(id){
+  await updateDoc(doc(db, "users", id), {
+    estado: "aprovado"
   });
+  loadAll();
 }
 
-// INICIAL
+// BLOQUEAR
+window.rejeitar = async function(id){
+  await updateDoc(doc(db, "users", id), {
+    estado: "pendente"
+  });
+  loadAll();
+}
+
+// INICIAR
 loadAll();
+
 </script>
 
 </body>
