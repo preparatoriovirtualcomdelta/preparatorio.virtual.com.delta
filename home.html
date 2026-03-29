@@ -18,7 +18,6 @@ body{
   border-radius:10px;
   max-width:400px;
   margin:auto;
-  box-shadow:0 5px 10px rgba(0,0,0,0.1);
 }
 
 input{
@@ -34,12 +33,10 @@ button{
   border:none;
   background:#0f172a;
   color:white;
-  cursor:pointer;
 }
 
 #status{
   margin-top:10px;
-  font-weight:bold;
 }
 </style>
 
@@ -48,16 +45,21 @@ button{
 <body>
 
 <h1>PREPARATÓRIO VIRTUAL COM DELTA</h1>
+<h3>Medicina e Ciências da Saúde</h3>
 
 <div class="box">
 
-<p><b>Área escolhida:</b></p>
+<p><b>Área:</b></p>
 <p id="area"></p>
+
+<p><b>Pagamento:</b></p>
+<p>IBAN: AO06 0040 0000 5071 2010 1017 8</p>
+<p>PROPRIETÁRIO: MPEKO CRUZ</p>
+
+<hr>
 
 <input id="email" placeholder="Email"><br>
 <input id="password" type="password" placeholder="Senha"><br>
-
-<input type="file" id="file"><br><br>
 
 <button onclick="register()">Criar Conta</button>
 <button onclick="login()">Entrar</button>
@@ -70,23 +72,20 @@ button{
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
   authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
-  projectId: "preparatoriovirtualcomdelta",
-  storageBucket: "preparatoriovirtualcomdelta.appspot.com",
+  projectId: "preparatoriovirtualcomdelta"
 };
 
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 const db = firebase.firestore();
-const storage = firebase.storage();
 
-// MOSTRAR ÁREA ESCOLHIDA
+// mostrar área
 document.getElementById("area").innerText = localStorage.getItem("area");
 
 // REGISTAR
@@ -94,31 +93,19 @@ function register(){
 
   let email = document.getElementById("email").value;
   let password = document.getElementById("password").value;
-  let file = document.getElementById("file").files[0];
 
   auth.createUserWithEmailAndPassword(email, password)
-  .then(user => {
+  .then(async user => {
 
     let uid = user.user.uid;
 
-    let ref = storage.ref("comprovativos/" + uid);
-
-    ref.put(file).then(()=>{
-
-      ref.getDownloadURL().then(async url => {
-
-        await db.collection("users").doc(uid).set({
-          email: email,
-          area: localStorage.getItem("area"),
-          estado: "pendente",
-          comprovativo: url
-        });
-
-        document.getElementById("status").innerText = "Conta criada! Aguarde aprovação.";
-
-      });
-
+    await db.collection("users").doc(uid).set({
+      email: email,
+      area: localStorage.getItem("area"),
+      estado: "pendente"
     });
+
+    document.getElementById("status").innerText = "Conta criada! Aguarde aprovação.";
 
   })
   .catch(err => {
@@ -145,9 +132,7 @@ function login(){
       return;
     }
 
-    let data = doc.data();
-
-    if(data.estado === "aprovado"){
+    if(doc.data().estado === "aprovado"){
       document.getElementById("status").innerText = "Acesso permitido ✔";
       window.location.href = "aulas.html";
     } else {
@@ -160,7 +145,6 @@ function login(){
   });
 
 }
-
 </script>
 
 </body>
