@@ -1,30 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Admin</title>
+</head>
+
 <body>
 
-<div id="loginAdmin">
-  <h2>Admin Login</h2>
-  <input id="adminPass" type="password" placeholder="Senha do Admin">
-  <button onclick="entrarAdmin()">Entrar</button>
-  <p id="erro"></p>
-</div>
+<h2>Painel Admin</h2>
 
-<div id="painel" style="display:none;">
-  <h2>Painel Admin</h2>
+<div id="users"></div>
 
-  <!-- AQUI FICA A LISTA DE ALUNOS -->
-  <p>Admin logado com sucesso</p>
-</div>
+<script type="module">
+import { db } from "./firebase.js";
+import { collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-<script>
-function entrarAdmin(){
-  let senha = document.getElementById("adminPass").value;
+const div = document.getElementById("users");
 
-  if(senha === "delta123"){
-    document.getElementById("loginAdmin").style.display = "none";
-    document.getElementById("painel").style.display = "block";
-  } else {
-    document.getElementById("erro").innerText = "Senha incorreta!";
-  }
+async function load(){
+  const snap = await getDocs(collection(db,"users"));
+
+  snap.forEach(u=>{
+    const d = u.data();
+
+    div.innerHTML += `
+      <p>
+        ${d.email} | ${d.status || "pendente"}
+        <button onclick="aprovar('${u.id}')">Aprovar</button>
+      </p>
+    `;
+  });
 }
+
+window.aprovar = async function(id){
+  await updateDoc(doc(db,"users",id),{
+    status:"aprovado"
+  });
+
+  alert("Aprovado");
+  location.reload();
+}
+
+load();
 </script>
 
 </body>
+</html>
