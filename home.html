@@ -62,27 +62,20 @@ button{
 button:hover{
   background:#16a34a;
 }
-
-input{
-  margin-top:10px;
-}
 </style>
 
 </head>
 
 <body>
 
-<!-- MENU -->
 <div class="sidebar">
   <h2>DELT∆</h2>
-
   <a href="#">🏠 Dashboard</a>
   <a href="#">📚 Cursos</a>
   <a href="#">💳 Pagamento</a>
   <a href="#" onclick="logout()">🚪 Sair</a>
 </div>
 
-<!-- CONTEÚDO -->
 <div class="main">
 
   <h1>Bem-vindo 👋</h1>
@@ -101,10 +94,11 @@ input{
   <div class="card">
     <h3>💳 Pagamento</h3>
     <p>Valor: 5.000 KZ</p>
+
     <p><b>IBAN:</b></p>
     <p style="font-size:18px;">AO06 0040 0000 5071 2010 1017 8</p>
 
-    <input type="file" id="file"><br>
+    <input type="file" id="file"><br><br>
     <button onclick="enviar()">Enviar Comprovativo</button>
 
     <p id="msg"></p>
