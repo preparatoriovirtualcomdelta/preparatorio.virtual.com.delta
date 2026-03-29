@@ -1,35 +1,174 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <title>Área do Aluno</title>
+<meta charset="UTF-8">
+<title>DELT∆ - Área do Aluno</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  display:flex;
+}
+
+/* MENU */
+.sidebar{
+  width:220px;
+  background:#0f172a;
+  color:white;
+  height:100vh;
+  padding:20px;
+}
+
+.sidebar h2{
+  margin-bottom:30px;
+}
+
+.sidebar a{
+  display:block;
+  color:white;
+  text-decoration:none;
+  margin:15px 0;
+}
+
+.sidebar a:hover{
+  color:#22c55e;
+}
+
+/* CONTEÚDO */
+.main{
+  flex:1;
+  padding:30px;
+  background:#f1f5f9;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+  margin-bottom:20px;
+}
+
+button{
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  background:#22c55e;
+  color:white;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#16a34a;
+}
+
+input{
+  margin-top:10px;
+}
+</style>
+
 </head>
 
-<body style="font-family: Arial; text-align:center;">
+<body>
 
-<h1>🎓 Bem-vindo ao Preparatório DELT∆</h1>
+<!-- MENU -->
+<div class="sidebar">
+  <h2>DELT∆</h2>
 
-<p>Acesso autorizado ✔</p>
+  <a href="#">🏠 Dashboard</a>
+  <a href="#">📚 Cursos</a>
+  <a href="#">💳 Pagamento</a>
+  <a href="#" onclick="logout()">🚪 Sair</a>
+</div>
 
-<hr>
+<!-- CONTEÚDO -->
+<div class="main">
 
-<h2>📚 Conteúdos</h2>
+  <h1>Bem-vindo 👋</h1>
 
-<button>Ver Vídeos</button>
-<button>Baixar PDF</button>
-<button>Baixar JPG</button>
+  <div class="card">
+    <h3>📊 Estado da Conta</h3>
+    <p style="color:green;">Aprovado ✔</p>
+  </div>
 
-<hr>
+  <div class="card">
+    <h3>📚 Curso</h3>
+    <p>Preparação para Medicina</p>
+    <button>Entrar no Curso</button>
+  </div>
 
-<p>Se estás aqui, o login funcionou corretamente.</p>
-<h2>📚 Aulas</h2>
+  <div class="card">
+    <h3>💳 Pagamento</h3>
+    <p>Valor: 5.000 KZ</p>
+    <p><b>IBAN:</b></p>
+    <p style="font-size:18px;">AO06 0040 0000 5071 2010 1017 8</p>
 
-<video controls width="300">
-  <source src="video.mp4" type="video/mp4">
-</video>
+    <input type="file" id="file"><br>
+    <button onclick="enviar()">Enviar Comprovativo</button>
 
-<p>📄 Material:</p>
-<a href="material.pdf" download>Baixar PDF</a><br>
-<a href="imagem.jpg" download>Baixar JPG</a>
+    <p id="msg"></p>
+  </div>
+
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
+  authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
+  projectId: "preparatoriovirtualcomdelta",
+  storageBucket: "preparatoriovirtualcomdelta.firebasestorage.app",
+  messagingSenderId: "554101533814",
+  appId: "1:554101533814:web:ed46583d92f4e14679c357"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+
+// ENVIAR COMPROVATIVO
+function enviar(){
+
+  let file = document.getElementById("file").files[0];
+
+  if(!file){
+    alert("Seleciona um ficheiro");
+    return;
+  }
+
+  let user = firebase.auth().currentUser;
+
+  if(!user){
+    alert("Erro de login");
+    return;
+  }
+
+  let ref = firebase.storage().ref("comprovativos/" + user.uid);
+
+  ref.put(file)
+    .then(()=> ref.getDownloadURL())
+    .then(async url => {
+
+      await db.collection("users").doc(user.uid).update({
+        comprovativo: url
+      });
+
+      document.getElementById("msg").innerText = "Comprovativo enviado ✔";
+
+    });
+}
+
+// LOGOUT
+function logout(){
+  window.location.href = "index.html";
+}
+</script>
+
 </body>
 </html>
