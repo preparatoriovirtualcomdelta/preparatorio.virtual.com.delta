@@ -11,7 +11,6 @@ body{
   display:flex;
 }
 
-/* MENU */
 .sidebar{
   width:220px;
   background:#0f172a;
@@ -35,7 +34,6 @@ body{
   color:#22c55e;
 }
 
-/* CONTEÚDO */
 .main{
   flex:1;
   padding:30px;
@@ -62,43 +60,57 @@ button{
 button:hover{
   background:#16a34a;
 }
+
+button:disabled{
+  background:gray;
+  cursor:not-allowed;
+}
 </style>
 
 </head>
 
 <body>
 
+<!-- MENU -->
 <div class="sidebar">
   <h2>DELT∆</h2>
+
   <a href="#">🏠 Dashboard</a>
   <a href="#">📚 Cursos</a>
   <a href="#">💳 Pagamento</a>
   <a href="#" onclick="logout()">🚪 Sair</a>
 </div>
 
+<!-- CONTEÚDO -->
 <div class="main">
 
   <h1>Bem-vindo 👋</h1>
 
+  <!-- STATUS -->
   <div class="card">
     <h3>📊 Estado da Conta</h3>
-    <p style="color:green;">Aprovado ✔</p>
+    <p id="status" style="color:red;">Estado: Não pago ⏳</p>
   </div>
 
+  <!-- CURSO -->
   <div class="card">
     <h3>📚 Curso</h3>
     <p>Preparação para Medicina</p>
-    <button>Entrar no Curso</button>
+
+    <button id="cursoBtn" disabled>🔒 Curso bloqueado</button>
   </div>
 
+  <!-- PAGAMENTO -->
   <div class="card">
     <h3>💳 Pagamento</h3>
+
     <p>Valor: 5.000 KZ</p>
 
     <p><b>IBAN:</b></p>
     <p style="font-size:18px;">AO06 0040 0000 5071 2010 1017 8</p>
 
     <input type="file" id="file"><br><br>
+
     <button onclick="enviar()">Enviar Comprovativo</button>
 
     <p id="msg"></p>
@@ -157,6 +169,30 @@ function enviar(){
 
     });
 }
+
+// STATUS + BLOQUEIO DO CURSO
+firebase.auth().onAuthStateChanged(function(user){
+
+  if(user){
+
+    db.collection("users").doc(user.uid).onSnapshot(doc=>{
+      let data = doc.data();
+
+      if(data.estado === "aprovado"){
+        document.getElementById("cursoBtn").disabled = false;
+        document.getElementById("cursoBtn").innerText = "Entrar no Curso ✔";
+        document.getElementById("status").innerText = "Estado: Pago ✔";
+        document.getElementById("status").style.color = "green";
+      } else {
+        document.getElementById("status").innerText = "Estado: Não pago ⏳";
+        document.getElementById("status").style.color = "red";
+      }
+
+    });
+
+  }
+
+});
 
 // LOGOUT
 function logout(){
