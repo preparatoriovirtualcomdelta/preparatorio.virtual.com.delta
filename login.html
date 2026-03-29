@@ -16,25 +16,26 @@ align-items:center;
 height:100vh;
 }
 
-/* CAIXA PRINCIPAL */
+/* ZOOM MAIOR DA TELA */
 .box{
-background:rgba(255,255,255,0.07);
-padding:70px 50px;
-border-radius:25px;
-width:460px;
-box-shadow:0 25px 90px rgba(0,0,0,0.7);
+background:rgba(255,255,255,0.08);
+padding:90px 60px;
+border-radius:28px;
+width:520px;
+box-shadow:0 30px 100px rgba(0,0,0,0.8);
 backdrop-filter:blur(15px);
 text-align:center;
+transform:scale(1.1); /* 🔥 ZOOM MAIOR */
 animation:fadeIn 0.8s ease;
 }
 
 h2{
-font-size:34px;
-margin-bottom:25px;
+font-size:38px;
+margin-bottom:30px;
 letter-spacing:1px;
 }
 
-/* INPUTS GRANDES */
+/* INPUTS */
 input{
 padding:18px;
 margin:10px 0;
@@ -47,7 +48,22 @@ background:#f1f5f9;
 color:black;
 }
 
-/* BOTÃO GRANDE */
+/* PASSWORD BOX */
+.passwordBox{
+position:relative;
+}
+
+.eye{
+position:absolute;
+right:15px;
+top:50%;
+transform:translateY(-50%);
+cursor:pointer;
+font-size:18px;
+color:#333;
+}
+
+/* BOTÃO */
 button{
 padding:18px;
 width:100%;
@@ -66,7 +82,6 @@ button:hover{
 transform:scale(1.05);
 }
 
-/* ERRO */
 .error{
 color:#ff4d4d;
 margin-top:15px;
@@ -76,15 +91,16 @@ font-weight:bold;
 
 /* ANIMAÇÃO */
 @keyframes fadeIn{
-from{opacity:0; transform:translateY(30px);}
-to{opacity:1; transform:translateY(0);}
+from{opacity:0; transform:translateY(30px) scale(0.9);}
+to{opacity:1; transform:translateY(0) scale(1);}
 }
 
 /* RESPONSIVO */
-@media(max-width:500px){
+@media(max-width:600px){
 .box{
 width:90%;
-padding:40px 20px;
+transform:scale(1);
+padding:50px 25px;
 }
 }
 </style>
@@ -97,7 +113,11 @@ padding:40px 20px;
 <h2>Login do Aluno</h2>
 
 <input id="email" placeholder="Email"><br>
-<input id="senha" type="password" placeholder="Senha"><br>
+
+<div class="passwordBox">
+<input id="senha" type="password" placeholder="Senha">
+<span class="eye" onclick="togglePassword()">👁</span>
+</div>
 
 <button onclick="login()">Entrar</button>
 
@@ -105,7 +125,7 @@ padding:40px 20px;
 
 </div>
 
-<!-- FIREBASE COMPLETO -->
+<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -124,7 +144,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// área selecionada no index
 const params = new URLSearchParams(window.location.search);
 const area = params.get("area");
 
@@ -140,7 +159,6 @@ signInWithEmailAndPassword(auth, email, senha)
 
 const user = userCredential.user;
 
-// verificar aprovação no Firestore
 const ref = doc(db, "users", user.uid);
 const snap = await getDoc(ref);
 
@@ -154,17 +172,21 @@ document.getElementById("erro").innerText = "Aguardando aprovação do admin";
 return;
 }
 
-// LOGIN OK
 localStorage.setItem("user", email);
 
-// redirecionar para aulas
 window.location.href = "aulas.html?area=" + area;
 
 })
-.catch((error) => {
+.catch(() => {
 document.getElementById("erro").innerText = "Email ou senha inválidos";
 });
 
+}
+
+/* 👁 VER / OCULTAR SENHA */
+window.togglePassword = function(){
+const senha = document.getElementById("senha");
+senha.type = senha.type === "password" ? "text" : "password";
 }
 </script>
 
