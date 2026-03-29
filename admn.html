@@ -1,93 +1,91 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <title>Painel Admin - DELT∆</title>
+<meta charset="UTF-8">
+<title>Admin DELT∆</title>
+
+<style>
+body{
+  font-family:Arial;
+  text-align:center;
+}
+
+.card{
+  border:1px solid #ccc;
+  margin:15px;
+  padding:15px;
+  border-radius:10px;
+}
+</style>
+
 </head>
 
-<body style="font-family: Arial; text-align:center;">
+<body>
 
-  <h1>👨‍💼 Painel Admin DELT∆</h1>
+<h1>👨‍💼 Painel Admin</h1>
 
-  <button onclick="logout()">🚪 Sair</button>
+<button onclick="logout()">Sair</button>
 
-  <hr>
+<div id="users"></div>
 
-  <div id="users"></div>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-  <!-- FIREBASE -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
+  authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
+  projectId: "preparatoriovirtualcomdelta",
+  storageBucket: "preparatoriovirtualcomdelta.firebasestorage.app",
+  messagingSenderId: "554101533814",
+  appId: "1:554101533814:web:ed46583d92f4e14679c357"
+};
 
-  <script>
-    // 🔒 BLOQUEIO TOTAL DE ACESSO
-    if(localStorage.getItem("admin") !== "true"){
-      alert("❌ Acesso negado");
-      window.location.href = "admin-login.html";
-    }
+firebase.initializeApp(firebaseConfig);
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
-      authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
-      projectId: "preparatoriovirtualcomdelta",
-      storageBucket: "preparatoriovirtualcomdelta.firebasestorage.app",
-      messagingSenderId: "554101533814",
-      appId: "1:554101533814:web:ed46583d92f4e14679c357"
-    };
+const db = firebase.firestore();
 
-    firebase.initializeApp(firebaseConfig);
+// CARREGAR USERS
+function load(){
+ db.collection("users").get().then(s=>{
+  let html="";
 
-    const db = firebase.firestore();
+  s.forEach(d=>{
+   let u=d.data();
 
-    // 📥 CARREGAR UTILIZADORES
-    function loadUsers(){
+   html+=`
+   <div class="card">
+    <p><b>Email:</b> ${u.email}</p>
+    <p><b>Estado:</b> ${u.estado}</p>
 
-      db.collection("users").get().then(snapshot => {
+    ${u.comprovativo 
+      ? `<a href="${u.comprovativo}" target="_blank">📄 Ver comprovativo</a><br><br>`
+      : `<p style="color:red;">Sem comprovativo</p>`}
 
-        let html = "";
+    <button onclick="aprovar('${d.id}')">✔ Aprovar</button>
+   </div>
+   `;
+  });
 
-        snapshot.forEach(doc => {
+  document.getElementById("users").innerHTML=html;
+ });
+}
 
-          let u = doc.data();
+// APROVAR
+function aprovar(id){
+ db.collection("users").doc(id).update({
+  estado:"aprovado"
+ }).then(load);
+}
 
-          html += `
-            <div style="border:1px solid #ccc; margin:10px; padding:10px;">
-              <p><b>Email:</b> ${u.email}</p>
-              <p><b>Estado:</b> ${u.estado}</p>
+// LOGOUT
+function logout(){
+  window.location.href = "index.html";
+}
 
-              <button onclick="aprovar('${doc.id}')">
-                ✔ Aprovar
-              </button>
-            </div>
-          `;
-        });
-
-        document.getElementById("users").innerHTML = html;
-
-      });
-
-    }
-
-    // ✔ APROVAR UTILIZADOR
-    function aprovar(id){
-
-      db.collection("users").doc(id).update({
-        estado: "aprovado"
-      }).then(() => {
-        loadUsers();
-      });
-
-    }
-
-    // 🚪 LOGOUT
-    function logout(){
-      localStorage.removeItem("admin");
-      window.location.href = "admin-login.html";
-    }
-
-    loadUsers();
-
-  </script>
+load();
+</script>
 
 </body>
 </html>
