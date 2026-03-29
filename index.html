@@ -2,179 +2,86 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<title>DELT∆ Preparatório</title>
+<title>PREPARATÓRIO VIRTUAL COM DELTA</title>
 
 <style>
 body{
-  margin:0;
   font-family:Arial;
-  background:linear-gradient(120deg,#0f172a,#1e293b);
-  color:white;
-}
-
-.menu{
-  background:#020617;
-  padding:15px;
   text-align:center;
-  font-size:20px;
-  font-weight:bold;
-}
-
-.container{
-  max-width:400px;
-  margin:80px auto;
-  background:#111827;
-  padding:30px;
-  border-radius:15px;
-  box-shadow:0 0 20px rgba(0,0,0,0.5);
+  background:#0f172a;
+  color:white;
+  padding:20px;
 }
 
 h1{
-  text-align:center;
+  margin-top:20px;
 }
 
-.price{
-  color:#fbbf24;
-  text-align:center;
+h2{
+  color:#38bdf8;
 }
 
-input{
-  width:100%;
-  padding:12px;
-  margin:8px 0;
-  border-radius:8px;
-  border:none;
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+  max-width:600px;
+  margin:30px auto;
 }
 
-button{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:none;
-  border-radius:8px;
-  background:#22c55e;
-  color:white;
-  font-size:16px;
+.card{
+  background:#1e293b;
+  padding:20px;
+  border-radius:12px;
   cursor:pointer;
+  transition:0.3s;
+  font-size:16px;
 }
 
-button:hover{
-  background:#16a34a;
-}
-
-.iban{
-  background:#1f2937;
-  padding:10px;
-  border-radius:10px;
-  margin:10px 0;
-  text-align:center;
-}
-
-#msg{
-  text-align:center;
-  margin-top:10px;
+.card:hover{
+  background:#334155;
+  transform:scale(1.05);
 }
 </style>
-
 </head>
 
 <body>
 
-<div class="menu">DELT∆ PREPARATÓRIO</div>
+<h1>PREPARATÓRIO VIRTUAL COM DELTA</h1>
+<h2>Medicina e Ciências da Saúde</h2>
 
-<div class="container">
+<p>Escolhe a área que pretendes preparar:</p>
 
-<h1>Bem-vindo</h1>
+<div class="grid">
 
-<p class="price">Valor: 5.000 KZ</p>
-
-<div class="iban">
-  <p><b>Pagamento via IBAN:</b></p>
-  <p style="font-size:18px;">AO06 0040 0000 5071 2010 1017 8</p>
-  <p>Envie comprovativo após pagamento</p>
-</div>
-
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Senha">
-
-<button onclick="register()">Criar Conta</button>
-<button onclick="login()">Entrar</button>
-
-<p id="msg"></p>
+<div class="card" onclick="go('Medicina Geral')">Medicina Geral</div>
+<div class="card" onclick="go('Medicina Dentária')">Medicina Dentária</div>
+<div class="card" onclick="go('Enfermagem')">Enfermagem</div>
+<div class="card" onclick="go('Farmácia')">Farmácia</div>
+<div class="card" onclick="go('Análises Clínicas')">Análises Clínicas</div>
+<div class="card" onclick="go('Fisioterapia')">Fisioterapia</div>
+<div class="card" onclick="go('Nutrição e Dietética')">Nutrição e Dietética</div>
+<div class="card" onclick="go('Cardiopneumologia')">Cardiopneumologia</div>
 
 </div>
-
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
-  authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
-  projectId: "preparatoriovirtualcomdelta",
-  storageBucket: "preparatoriovirtualcomdelta.firebasestorage.app",
-  messagingSenderId: "554101533814",
-  appId: "1:554101533814:web:ed46583d92f4e14679c357"
-};
+function go(area){
+  // guarda a área escolhida
+  localStorage.setItem("area", area);
 
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-function msg(t){
-  document.getElementById("msg").innerText = t;
-}
-
-// REGISTO
-function register(){
-  let email = document.getElementById("email").value;
-  let password = document.getElementById("password").value;
-
-  auth.createUserWithEmailAndPassword(email, password)
-    .then(async (user) => {
-
-      await db.collection("users").doc(user.user.uid).set({
-        email: email,
-        estado: "pendente"
-      });
-
-      msg("Conta criada ⏳ Aguarde aprovação");
-
-    })
-    .catch(err => msg(err.message));
-}
-
-// LOGIN
-function login(){
-  let email = document.getElementById("email").value;
-  let password = document.getElementById("password").value;
-
-  auth.signInWithEmailAndPassword(email, password)
-    .then(async (user) => {
-
-      let doc = await db.collection("users").doc(user.user.uid).get();
-
-      if(!doc.exists){
-        msg("Conta não encontrada ❌");
-        return;
-      }
-
-      let data = doc.data();
-
-      if(data.estado === "aprovado"){
-        window.location.href = "home.html";
-      } else {
-        msg("⏳ Ainda não aprovado");
-        auth.signOut();
-      }
-
-    })
-    .catch(err => msg(err.message));
+  // vai para login
+  window.location.href = "home.html";
 }
 </script>
+
+<hr style="margin-top:40px;">
+
+<footer>
+  <p><b>PREPARATÓRIO VIRTUAL COM DELTA</b></p>
+  <p>IBAN: AO06 0040 0000 5071 2010 1017 8</p>
+  <p>PROPRIETÁRIO DA CONTA: MPEKO CRUZ</p>
+</footer>
 
 </body>
 </html>
