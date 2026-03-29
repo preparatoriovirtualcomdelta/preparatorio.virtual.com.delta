@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>LOGIN - PREPARATÓRIO DELT∆</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#0f172a,#1e293b);
+color:white;
+text-align:center;
+}
+
+.box{
+margin-top:100px;
+}
+
+input{
+padding:12px;
+margin:8px;
+width:260px;
+border-radius:8px;
+border:none;
+outline:none;
+font-size:14px;
+}
+
+button{
+padding:12px 20px;
+border:none;
+border-radius:8px;
+background:#22c55e;
+color:white;
+cursor:pointer;
+font-size:14px;
+transition:0.3s;
+}
+
+button:hover{
+transform:scale(1.05);
+}
+
+.error{
+color:#ff4d4d;
+margin-top:10px;
+font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>Login do Aluno</h2>
+
+<input id="email" placeholder="Email"><br>
+<input id="senha" type="password" placeholder="Senha"><br>
+
+<button onclick="login()">Entrar</button>
+
+<div class="error" id="erro"></div>
+
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuZ2kOWQ",
+  authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
+  projectId: "preparatoriovirtualcomdelta",
+  storageBucket: "preparatoriovirtualcomdelta.firebasestorage.app",
+  messagingSenderId: "554101533814",
+  appId: "1:554101533814:web:ed46583d92f4e14679c357"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// área escolhida no index
+const params = new URLSearchParams(window.location.search);
+const area = params.get("area");
+
+window.login = function(){
+
+const email = document.getElementById("email").value;
+const senha = document.getElementById("senha").value;
+
+document.getElementById("erro").innerText = "";
+
+signInWithEmailAndPassword(auth, email, senha)
+.then(async (userCredential) => {
+
+const user = userCredential.user;
+
+// procurar aprovação no Firestore
+const ref = doc(db, "users", user.uid);
+const snap = await getDoc(ref);
+
+if (!snap.exists()) {
+document.getElementById("erro").innerText = "Conta não existe no sistema do admin";
+return;
+}
+
+if (snap.data().approved !== true) {
+document.getElementById("erro").innerText = "Aguardando aprovação do admin";
+return;
+}
+
+// LOGIN OK
+localStorage.setItem("user", email);
+
+window.location.href = "aulas.html?area=" + area;
+
+})
+.catch((error) => {
+document.getElementById("erro").innerText = "Email ou senha inválidos";
+});
+
+}
+</script>
+
+</body>
+</html>
