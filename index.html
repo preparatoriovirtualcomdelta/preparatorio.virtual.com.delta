@@ -2,32 +2,32 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>PREPARATÓRIO VIRTUAL COM DELT∆</title>
+  <title>PREPARATÓRIO VIRTUAL DELT∆</title>
 </head>
 
 <body style="font-family: Arial; text-align:center;">
 
-<h1>PREPARATÓRIO VIRTUAL COM DELT∆</h1>
+<h1>PREPARATÓRIO VIRTUAL DELT∆</h1>
 
 <h2>Valor: 5.000 KZ</h2>
 
-<p>IBAN: 0040 0000 5071 2010 1017 8</p>
-
 <hr>
 
-<input id="email" placeholder="Email" autocomplete="off">
-<input id="password" type="password" placeholder="Senha" autocomplete="off">
+<input id="email" placeholder="Email" autocomplete="off"><br><br>
+<input id="password" type="password" placeholder="Senha" autocomplete="off"><br><br>
 
+<button onclick="register()">Criar Conta</button>
 <button onclick="login()">Entrar</button>
 
 <p id="msg"></p>
 
-<!-- FIREBASE -->
+<!-- FIREBASE COMPAT -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
+  // 🔥 TEU FIREBASE JÁ CORRIGIDO
   const firebaseConfig = {
     apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
     authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
@@ -39,26 +39,61 @@
 
   firebase.initializeApp(firebaseConfig);
 
+  const auth = firebase.auth();
   const db = firebase.firestore();
 
-  function login() {
-
-    let email = document.getElementById("email").value;
-
-    db.collection("pedidos").add({
-      email: email,
-      estado: "pendente"
-    })
-    .then(() => {
-      document.getElementById("msg").innerText =
-        "Pedido enviado ⏳ Aguarde aprovação";
-    })
-    .catch((error) => {
-      document.getElementById("msg").innerText =
-        "Erro: " + error.message;
-    });
-
+  function msg(t){
+    document.getElementById("msg").innerText = t;
   }
+
+  // 👤 REGISTO
+  function register() {
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
+
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(async (user) => {
+
+        await db.collection("users").doc(user.user.uid).set({
+          email: email,
+          estado: "pendente"
+        });
+
+        msg("Conta criada ⏳ Aguarde aprovação");
+
+      })
+      .catch(err => msg(err.message));
+  }
+
+  // 🔐 LOGIN
+  function login() {
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
+
+    auth.signInWithEmailAndPassword(email, password)
+      .then(async (user) => {
+
+        let doc = await db.collection("users").doc(user.user.uid).get();
+
+        if (!doc.exists) {
+          msg("Conta não encontrada");
+          return;
+        }
+
+        let data = doc.data();
+
+        if (data.estado === "aprovado") {
+          msg("Acesso permitido ✔");
+          window.location.href = "home.html";
+        } else {
+          msg("Ainda não aprovado ⏳");
+          auth.signOut();
+        }
+
+      })
+      .catch(err => msg(err.message));
+  }
+
 </script>
 
 </body>
