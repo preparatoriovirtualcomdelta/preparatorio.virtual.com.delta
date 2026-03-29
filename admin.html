@@ -8,7 +8,7 @@
 body{
 margin:0;
 font-family:Arial;
-background:#0f172a;
+background:linear-gradient(135deg,#0f172a,#1e293b,#0f172a);
 color:white;
 display:flex;
 justify-content:center;
@@ -19,31 +19,38 @@ min-height:100vh;
 /* LOGIN */
 .login{
 text-align:center;
-transform:scale(1.1);
+transform:scale(1.2);
 }
 
 input{
-padding:14px;
-margin:5px;
-border-radius:8px;
+padding:16px;
+margin:6px;
+border-radius:10px;
 border:none;
+font-size:16px;
 }
 
 button{
-padding:10px 20px;
-margin:5px;
+padding:12px 20px;
+margin:6px;
 border:none;
-border-radius:8px;
+border-radius:10px;
 background:#22c55e;
 color:white;
 cursor:pointer;
+font-size:16px;
+transition:0.3s;
+}
+
+button:hover{
+transform:scale(1.05);
 }
 
 /* PAINEL */
 .container{
 display:none;
-width:90%;
-max-width:1200px;
+width:95%;
+max-width:1300px;
 transform:scale(1.05);
 }
 
@@ -51,16 +58,23 @@ transform:scale(1.05);
 .card{
 background:#1e293b;
 padding:20px;
-margin:10px 0;
-border-radius:12px;
+margin:12px 0;
+border-radius:15px;
 display:flex;
 justify-content:space-between;
 align-items:center;
+font-size:17px;
+box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
 
 /* STATUS */
-.ok{background:green;padding:5px;border-radius:5px;}
-.no{background:red;padding:5px;border-radius:5px;}
+.ok{background:#16a34a;padding:6px;border-radius:6px;}
+.no{background:#dc2626;padding:6px;border-radius:6px;}
+
+hr{
+margin:30px 0;
+border:1px solid #334155;
+}
 </style>
 </head>
 
@@ -68,10 +82,10 @@ align-items:center;
 
 <!-- LOGIN -->
 <div class="login" id="loginBox">
-<h2>Admin</h2>
+<h2>Admin DELT∆</h2>
 <input type="password" id="senhaAdmin" placeholder="Senha"><br>
 <button onclick="entrar()">Entrar</button>
-<p id="erro"></p>
+<p id="erro" style="color:red;"></p>
 </div>
 
 <!-- PAINEL -->
@@ -146,7 +160,7 @@ div.className="card";
 
 div.innerHTML=`
 <div>
-${data.email}<br>
+<b>${data.email || "Sem email"}</b><br>
 <span class="${data.approved?'ok':'no'}">
 ${data.approved?'APROVADO':'PENDENTE'}
 </span>
@@ -165,7 +179,7 @@ lista.appendChild(div);
 });
 }
 
-// UPLOAD DE AULAS
+// 🚀 UPLOAD COMPLETO (VIDEO + PDF + IMAGEM + ÁREA)
 window.upload = async function(){
 
 const file = document.getElementById("ficheiro").files[0];
@@ -173,18 +187,32 @@ const titulo = document.getElementById("titulo").value;
 
 if(!file || !titulo) return alert("Preencha tudo");
 
-const storageRef = ref(storage, "aulas/" + file.name);
+// detectar tipo
+let tipo = "outro";
+if(file.type.includes("video")) tipo = "video";
+else if(file.type.includes("pdf")) tipo = "pdf";
+else if(file.type.includes("image")) tipo = "imagem";
+
+// escolher área
+const area = prompt("Área da aula (medicina, enfermagem, farmacia...)");
+
+if(!area) return alert("Área obrigatória");
+
+const storageRef = ref(storage, "aulas/" + Date.now() + "_" + file.name);
 
 await uploadBytes(storageRef, file);
 
 const url = await getDownloadURL(storageRef);
 
+// guardar no banco
 await addDoc(collection(db,"aulas"),{
 titulo: titulo,
-url: url
+url: url,
+tipo: tipo,
+area: area.toLowerCase()
 });
 
-alert("Aula enviada!");
+alert("Aula enviada com sucesso!");
 }
 
 // COMPROVATIVOS
