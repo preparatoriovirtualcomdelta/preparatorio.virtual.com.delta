@@ -98,7 +98,7 @@ margin-top:10px;
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -109,7 +109,7 @@ const firebaseConfig = {
   messagingSenderId: "554101533814",
   appId: "1:554101533814:web:ed46583d92f4e14679c357"
 };
-  
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -120,6 +120,8 @@ const email = document.getElementById("email").value;
 const senha = document.getElementById("senha").value;
 const area = document.getElementById("area").value;
 
+document.getElementById("erro").innerText = "";
+
 if(!email || !senha || !area){
 document.getElementById("erro").innerText = "Preenche todos os campos";
 return;
@@ -127,39 +129,58 @@ return;
 
 try {
 
+// 🔥 TENTA LOGIN
 const userCredential = await signInWithEmailAndPassword(auth, email, senha);
-const user = userCredential.user;
+await verificar(userCredential.user, email, area);
+
+} catch(error){
+
+// 🔥 SE NÃO EXISTIR → CRIA CONTA
+if(error.code === "auth/user-not-found"){
+
+const newUser = await createUserWithEmailAndPassword(auth, email, senha);
+
+await setDoc(doc(db,"users",newUser.user.uid),{
+email: email,
+area: area,
+approved: false
+});
+
+document.getElementById("erro").innerText = "Conta criada. Aguarde aprovação do admin";
+return;
+
+}
+
+document.getElementById("erro").innerText = "Email ou senha inválidos";
+}
+
+}
+
+// 🔥 VERIFICA FIRESTORE
+async function verificar(user, email, area){
 
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-// 🔥 CRIA AUTOMATICAMENTE SE NÃO EXISTIR
 if(!snap.exists()){
 await setDoc(ref,{
 email: email,
 area: area,
 approved: false
 });
-document.getElementById("erro").innerText = "Conta criada. Aguarde aprovação do admin";
+document.getElementById("erro").innerText = "Conta criada. Aguarde aprovação";
 return;
 }
 
-// 🔥 VERIFICA APROVAÇÃO
 if(snap.data().approved !== true){
 document.getElementById("erro").innerText = "Aguardando aprovação";
 return;
 }
 
 localStorage.setItem("user", email);
-localStorage.setItem("area", area);
+localStorage.setItem("area", snap.data().area);
 
 window.location.href = "aulas.html";
-
-}
-catch(error){
-document.getElementById("erro").innerText = "Email ou senha inválidos";
-console.log(error.code);
-}
 
 }
 
@@ -172,4 +193,4 @@ senha.type = senha.type === "password" ? "text" : "password";
 </script>
 
 </body>
-</html>
+  </html>
