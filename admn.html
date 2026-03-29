@@ -1,149 +1,30 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-<meta charset="UTF-8">
-<title>Admin DELTA</title>
-
-<style>
-body{
-  font-family:Arial;
-  background:#f4f4f4;
-  text-align:center;
-}
-
-h1{
-  margin-top:20px;
-}
-
-.card{
-  background:white;
-  padding:15px;
-  margin:15px auto;
-  width:80%;
-  border-radius:10px;
-  box-shadow:0 5px 10px rgba(0,0,0,0.1);
-}
-
-button{
-  padding:8px;
-  margin:5px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-}
-
-.aprovar{
-  background:#22c55e;
-  color:white;
-}
-
-.rejeitar{
-  background:red;
-  color:white;
-}
-
-.filtro{
-  background:#0f172a;
-  color:white;
-}
-</style>
-
-</head>
-
 <body>
 
-<h1>👨‍💼 ADMIN - DELTA</h1>
+<div id="loginAdmin">
+  <h2>Admin Login</h2>
+  <input id="adminPass" type="password" placeholder="Senha do Admin">
+  <button onclick="entrarAdmin()">Entrar</button>
+  <p id="erro"></p>
+</div>
 
-<button class="filtro" onclick="loadAll()">Todos</button>
-<button class="filtro" onclick="loadPendentes()">Pendentes</button>
-<button class="filtro" onclick="loadAprovados()">Aprovados</button>
+<div id="painel" style="display:none;">
+  <h2>Painel Admin</h2>
 
-<div id="users"></div>
+  <!-- AQUI FICA A LISTA DE ALUNOS -->
+  <p>Admin logado com sucesso</p>
+</div>
 
-<script type="module">
+<script>
+function entrarAdmin(){
+  let senha = document.getElementById("adminPass").value;
 
-import { db } from "./firebase.js";
-
-import {
-  collection,
-  getDocs,
-  doc,
-  updateDoc,
-  query,
-  where
-} from "firebase/firestore";
-
-const container = document.getElementById("users");
-
-function render(snapshot){
-
-  let html = "";
-
-  snapshot.forEach(docSnap => {
-
-    let u = docSnap.data();
-    let id = docSnap.id;
-
-    html += `
-    <div class="card">
-      <p><b>Email:</b> ${u.email}</p>
-      <p><b>Estado:</b> ${u.estado}</p>
-
-      ${
-        u.comprovativo
-        ? `<a href="${u.comprovativo}" target="_blank">📄 Ver comprovativo</a><br><br>`
-        : `<p style="color:red;">Sem comprovativo</p>`
-      }
-
-      <button class="aprovar" onclick="aprovar('${id}')">✔ Aprovar</button>
-      <button class="rejeitar" onclick="rejeitar('${id}')">❌ Bloquear</button>
-    </div>
-    `;
-  });
-
-  container.innerHTML = html;
+  if(senha === "delta123"){
+    document.getElementById("loginAdmin").style.display = "none";
+    document.getElementById("painel").style.display = "block";
+  } else {
+    document.getElementById("erro").innerText = "Senha incorreta!";
+  }
 }
-
-// TODOS
-window.loadAll = async function(){
-  const snap = await getDocs(collection(db, "users"));
-  render(snap);
-}
-
-// PENDENTES
-window.loadPendentes = async function(){
-  const q = query(collection(db, "users"), where("estado","==","pendente"));
-  const snap = await getDocs(q);
-  render(snap);
-}
-
-// APROVADOS
-window.loadAprovados = async function(){
-  const q = query(collection(db, "users"), where("estado","==","aprovado"));
-  const snap = await getDocs(q);
-  render(snap);
-}
-
-// APROVAR
-window.aprovar = async function(id){
-  await updateDoc(doc(db, "users", id), {
-    estado: "aprovado"
-  });
-  loadAll();
-}
-
-// BLOQUEAR
-window.rejeitar = async function(id){
-  await updateDoc(doc(db, "users", id), {
-    estado: "pendente"
-  });
-  loadAll();
-}
-
-// INICIAR
-loadAll();
-
 </script>
 
 </body>
-</html>
