@@ -1,87 +1,66 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>PREPARATÓRIO VIRTUAL COM DELTA</title>
+<title>PREPARATÓRIO VIRTUAL COM DELT∆</title></title>
 
 <style>
 body{
-  font-family:Arial;
-  text-align:center;
-  background:#0f172a;
-  color:white;
-  padding:20px;
+margin:0;
+font-family:Arial;
+background:#0f172a;
+color:white;
+text-align:center;
 }
 
-h1{
-  margin-top:20px;
+.menu{
+display:flex;
+justify-content:space-between;
+padding:15px;
+background:black;
 }
 
-h2{
-  color:#38bdf8;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:15px;
-  max-width:600px;
-  margin:30px auto;
+.cards{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+margin-top:40px;
 }
 
 .card{
-  background:#1e293b;
-  padding:20px;
-  border-radius:12px;
-  cursor:pointer;
-  transition:0.3s;
-  font-size:16px;
+background:white;
+color:black;
+padding:40px;
+margin:15px;
+border-radius:15px;
+font-size:18px;
+cursor:pointer;
+transition:0.3s;
 }
 
 .card:hover{
-  background:#334155;
-  transform:scale(1.05);
+transform:scale(1.3);
 }
 </style>
 </head>
 
 <body>
 
-<h1>PREPARATÓRIO VIRTUAL COM DELTA</h1>
-<h2>Medicina e Ciências da Saúde</h2>
-
-<p>Escolhe a área que pretendes preparar:</p>
-
-<div class="grid">
-
-<div class="card" onclick="go('Medicina Geral')">Medicina Geral</div>
-<div class="card" onclick="go('Medicina Dentária')">Medicina Dentária</div>
-<div class="card" onclick="go('Enfermagem')">Enfermagem</div>
-<div class="card" onclick="go('Farmácia')">Farmácia</div>
-<div class="card" onclick="go('Análises Clínicas')">Análises Clínicas</div>
-<div class="card" onclick="go('Fisioterapia')">Fisioterapia</div>
-<div class="card" onclick="go('Nutrição e Dietética')">Nutrição e Dietética</div>
-<div class="card" onclick="go('Cardiopneumologia')">Cardiopneumologia</div>
-
+<div class="menu">
+<div>PREPARATÓRIO VIRTUAL COM DELT∆</div>
+<a href="admin.html" style="color:white">ADMIN</a>
 </div>
 
-<script>
-function go(area){
-  // guarda a área escolhida
-  localStorage.setItem("area", area);
+<h1>ÁREAS</h1>
 
-  // vai para login
-  window.location.href = "home.html";
-}
-</script>
-
-<hr style="margin-top:40px;">
-
-<footer>
-  <p><b>PREPARATÓRIO VIRTUAL COM DELTA</b></p>
-  <p>IBAN: AO06 0040 0000 5071 2010 1017 8</p>
-  <p>PROPRIETÁRIO DA CONTA: MPEKO CRUZ</p>
-</footer>
-
+<div class="cards">
+<div class="card">Medicina</div>
+<div class="card">Enfermagem</div>
+<div class="card">Farmácia</div>
+<div class="card">Fisioterapia</div>
+<div class="card">Análises Clínicas</div>
+<div class="card">Nutrição e Dietética</div>
+<div class="card">Cardiopneumologia</div>
+  
 </body>
 </html>
