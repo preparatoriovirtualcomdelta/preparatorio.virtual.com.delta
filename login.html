@@ -2,80 +2,64 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>LOGIN - PREPARATÓRIO DELT∆</title>
+<title>LOGIN - DELT∆</title>
 
 <style>
 body{
 margin:0;
 font-family:Arial;
 background:linear-gradient(135deg,#0f172a,#1e293b,#0f172a);
-color:white;
 display:flex;
 justify-content:center;
 align-items:center;
 height:100vh;
+color:white;
 }
 
 .box{
 background:rgba(255,255,255,0.08);
-padding:90px 60px;
-border-radius:28px;
-width:520px;
-box-shadow:0 30px 100px rgba(0,0,0,0.8);
-backdrop-filter:blur(15px);
+padding:70px;
+border-radius:25px;
+width:420px;
 text-align:center;
-transform:scale(1.1);
 }
 
-h2{
-font-size:38px;
-margin-bottom:30px;
-}
-
-input{
-padding:18px;
-margin:10px 0;
+input,select{
 width:100%;
-border-radius:12px;
+padding:15px;
+margin:10px 0;
+border-radius:10px;
 border:none;
-outline:none;
 font-size:16px;
-background:#f1f5f9;
+}
+
+.passwordBox{
+position:relative;
+}
+
+.eye{
+position:absolute;
+right:15px;
+top:50%;
+transform:translateY(-50%);
+cursor:pointer;
 color:black;
 }
 
-select{
-padding:18px;
-margin:10px 0;
-width:100%;
-border-radius:12px;
-border:none;
-font-size:16px;
-}
-
 button{
-padding:18px;
 width:100%;
+padding:15px;
 border:none;
-border-radius:12px;
-background:linear-gradient(90deg,#22c55e,#16a34a);
+border-radius:10px;
+background:#22c55e;
 color:white;
-cursor:pointer;
 font-size:18px;
-font-weight:bold;
-margin-top:10px;
-transition:0.3s;
-}
-
-button:hover{
-transform:scale(1.05);
+cursor:pointer;
 }
 
 .error{
-color:#ff4d4d;
-margin-top:15px;
-font-size:14px;
-font-weight:bold;
+color:red;
+margin-top:10px;
 }
 </style>
 </head>
@@ -84,15 +68,17 @@ font-weight:bold;
 
 <div class="box">
 
-<h2>Login do Aluno</h2>
+<h2>Login</h2>
 
 <input id="email" placeholder="Email">
 
+<div class="passwordBox">
 <input id="senha" type="password" placeholder="Senha">
+<span class="eye" onclick="toggleSenha()">👁</span>
+</div>
 
-<!-- ÁREA DO CURSO -->
 <select id="area">
-<option value="">Seleciona a área</option>
+<option value="">Seleciona área</option>
 <option value="medicina">Medicina</option>
 <option value="enfermagem">Enfermagem</option>
 <option value="farmacia">Farmácia</option>
@@ -116,9 +102,6 @@ const firebaseConfig = {
   apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuZ2kOWQ",
   authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
   projectId: "preparatoriovirtualcomdelta",
-  storageBucket: "preparatoriovirtualcomdelta.firebasestorage.app",
-  messagingSenderId: "554101533814",
-  appId: "1:554101533814:web:ed46583d92f4e14679c357"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -131,9 +114,6 @@ const email = document.getElementById("email").value;
 const senha = document.getElementById("senha").value;
 const area = document.getElementById("area").value;
 
-document.getElementById("erro").innerText = "";
-
-// validação básica
 if(!email || !senha || !area){
 document.getElementById("erro").innerText = "Preenche todos os campos";
 return;
@@ -144,30 +124,36 @@ signInWithEmailAndPassword(auth, email, senha)
 
 const user = userCredential.user;
 
-const ref = doc(db, "users", user.uid);
+const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-if (!snap.exists()) {
+if(!snap.exists()){
 document.getElementById("erro").innerText = "Conta não existe no sistema";
 return;
 }
 
-if (snap.data().approved !== true) {
-document.getElementById("erro").innerText = "Aguardando aprovação do admin";
+if(snap.data().approved !== true){
+document.getElementById("erro").innerText = "Aguardando aprovação";
 return;
 }
 
-// GUARDA DADOS DO ALUNO
 localStorage.setItem("user", email);
 localStorage.setItem("area", area);
 
 window.location.href = "aulas.html";
 
 })
-.catch(() => {
+.catch((error)=>{
 document.getElementById("erro").innerText = "Email ou senha inválidos";
+console.log(error.code);
 });
 
+}
+
+// 👁 mostrar/ocultar senha
+window.toggleSenha = function(){
+const senha = document.getElementById("senha");
+senha.type = senha.type === "password" ? "text" : "password";
 }
 
 </script>
