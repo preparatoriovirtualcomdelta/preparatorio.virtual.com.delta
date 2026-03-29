@@ -2,202 +2,97 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<title>DELT∆ - Área do Aluno</title>
-
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  display:flex;
-}
-
-.sidebar{
-  width:220px;
-  background:#0f172a;
-  color:white;
-  height:100vh;
-  padding:20px;
-}
-
-.sidebar h2{
-  margin-bottom:30px;
-}
-
-.sidebar a{
-  display:block;
-  color:white;
-  text-decoration:none;
-  margin:15px 0;
-}
-
-.sidebar a:hover{
-  color:#22c55e;
-}
-
-.main{
-  flex:1;
-  padding:30px;
-  background:#f1f5f9;
-}
-
-.card{
-  background:white;
-  padding:20px;
-  border-radius:12px;
-  box-shadow:0 5px 15px rgba(0,0,0,0.1);
-  margin-bottom:20px;
-}
-
-button{
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  background:#22c55e;
-  color:white;
-  cursor:pointer;
-}
-
-button:hover{
-  background:#16a34a;
-}
-
-button:disabled{
-  background:gray;
-  cursor:not-allowed;
-}
-</style>
-
+<title>Login DELTA</title>
 </head>
 
-<body>
+<body style="font-family:Arial;text-align:center;">
 
-<!-- MENU -->
-<div class="sidebar">
-  <h2>DELT∆</h2>
+<h1>PREPARATÓRIO VIRTUAL COM DELTA</h1>
+<h3>Medicina e Ciências da Saúde</h3>
 
-  <a href="#">🏠 Dashboard</a>
-  <a href="#">📚 Cursos</a>
-  <a href="#">💳 Pagamento</a>
-  <a href="#" onclick="logout()">🚪 Sair</a>
-</div>
+<hr>
 
-<!-- CONTEÚDO -->
-<div class="main">
+<input id="email" placeholder="Email"><br><br>
+<input id="password" type="password" placeholder="Senha"><br><br>
 
-  <h1>Bem-vindo 👋</h1>
+<input type="file" id="comprovativo"><br><br>
 
-  <!-- STATUS -->
-  <div class="card">
-    <h3>📊 Estado da Conta</h3>
-    <p id="status" style="color:red;">Estado: Não pago ⏳</p>
-  </div>
+<button onclick="register()">Criar Conta</button>
+<button onclick="login()">Entrar</button>
 
-  <!-- CURSO -->
-  <div class="card">
-    <h3>📚 Curso</h3>
-    <p>Preparação para Medicina</p>
+<p id="msg"></p>
 
-    <button id="cursoBtn" disabled>🔒 Curso bloqueado</button>
-  </div>
+<script type="module">
 
-  <!-- PAGAMENTO -->
-  <div class="card">
-    <h3>💳 Pagamento</h3>
+import { auth, db, storage } from "./firebase.js";
 
-    <p>Valor: 5.000 KZ</p>
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
+} from "firebase/auth";
 
-    <p><b>IBAN:</b></p>
-    <p style="font-size:18px;">AO06 0040 0000 5071 2010 1017 8</p>
+import {
+  doc,
+  setDoc,
+  getDoc
+} from "firebase/firestore";
 
-    <input type="file" id="file"><br><br>
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "firebase/storage";
 
-    <button onclick="enviar()">Enviar Comprovativo</button>
-
-    <p id="msg"></p>
-  </div>
-
-</div>
-
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
-  authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
-  projectId: "preparatoriovirtualcomdelta",
-  storageBucket: "preparatoriovirtualcomdelta.firebasestorage.app",
-  messagingSenderId: "554101533814",
-  appId: "1:554101533814:web:ed46583d92f4e14679c357"
-};
-
-firebase.initializeApp(firebaseConfig);
-
-const db = firebase.firestore();
-
-// ENVIAR COMPROVATIVO
-function enviar(){
-
-  let file = document.getElementById("file").files[0];
-
-  if(!file){
-    alert("Seleciona um ficheiro");
-    return;
-  }
-
-  let user = firebase.auth().currentUser;
-
-  if(!user){
-    alert("Erro de login");
-    return;
-  }
-
-  let ref = firebase.storage().ref("comprovativos/" + user.uid);
-
-  ref.put(file)
-    .then(()=> ref.getDownloadURL())
-    .then(async url => {
-
-      await db.collection("users").doc(user.uid).update({
-        comprovativo: url
-      });
-
-      document.getElementById("msg").innerText = "Comprovativo enviado ✔";
-
-    });
+function msg(t){
+  document.getElementById("msg").innerText = t;
 }
 
-// STATUS + BLOQUEIO DO CURSO
-firebase.auth().onAuthStateChanged(function(user){
+window.register = async function(){
 
-  if(user){
+  let email = email.value;
+  let password = password.value;
+  let file = document.getElementById("comprovativo").files[0];
 
-    db.collection("users").doc(user.uid).onSnapshot(doc=>{
-      let data = doc.data();
+  const userCred = await createUserWithEmailAndPassword(auth, email, password);
 
-      if(data.estado === "aprovado"){
-        document.getElementById("cursoBtn").disabled = false;
-        document.getElementById("cursoBtn").innerText = "Entrar no Curso ✔";
-        document.getElementById("status").innerText = "Estado: Pago ✔";
-        document.getElementById("status").style.color = "green";
-      } else {
-        document.getElementById("status").innerText = "Estado: Não pago ⏳";
-        document.getElementById("status").style.color = "red";
-      }
+  let uid = userCred.user.uid;
 
-    });
+  let fileRef = ref(storage, "comprovativos/" + uid);
 
+  await uploadBytes(fileRef, file);
+
+  let url = await getDownloadURL(fileRef);
+
+  await setDoc(doc(db, "users", uid), {
+    email: email,
+    estado: "pendente",
+    comprovativo: url
+  });
+
+  msg("Conta criada! Aguarde aprovação.");
+
+}
+
+window.login = async function(){
+
+  let email = email.value;
+  let password = password.value;
+
+  const userCred = await signInWithEmailAndPassword(auth, email, password);
+
+  let uid = userCred.user.uid;
+
+  let snap = await getDoc(doc(db, "users", uid));
+
+  if(snap.data().estado === "aprovado"){
+    msg("Acesso permitido ✔");
+    window.location.href = "aulas.html";
+  } else {
+    msg("Ainda não aprovado ⏳");
   }
 
-});
-
-// LOGOUT
-function logout(){
-  window.location.href = "index.html";
 }
+
 </script>
 
 </body>
