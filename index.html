@@ -1,100 +1,90 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <title>PREPARATÓRIO VIRTUAL DELT∆</title>
+<meta charset="UTF-8">
+<title>DELT∆ Preparatório</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(120deg,#0f172a,#1e293b);
+  color:white;
+}
+
+.container{
+  max-width:400px;
+  margin:80px auto;
+  background:#111827;
+  padding:30px;
+  border-radius:15px;
+  box-shadow:0 0 20px rgba(0,0,0,0.5);
+}
+
+h1{
+  font-size:28px;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:8px;
+  border:none;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:8px;
+  background:#22c55e;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#16a34a;
+}
+
+.menu{
+  background:#0f172a;
+  padding:15px;
+  text-align:center;
+  font-weight:bold;
+}
+
+.price{
+  color:#fbbf24;
+}
+</style>
+
 </head>
 
-<body style="font-family: Arial; text-align:center;">
+<body>
 
-<h1>PREPARATÓRIO VIRTUAL DELT∆</h1>
+<div class="menu">DELT∆ PREPARATÓRIO</div>
 
-<h2>Valor: 5.000 KZ</h2>
+<div class="container">
 
-<hr>
+<h1>Bem-vindo</h1>
+<p class="price">Valor: 5.000 KZ</p>
 
-<input id="email" placeholder="Email" autocomplete="off"><br><br>
-<input id="password" type="password" placeholder="Senha" autocomplete="off"><br><br>
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Senha">
 
 <button onclick="register()">Criar Conta</button>
 <button onclick="login()">Entrar</button>
 
 <p id="msg"></p>
 
-<!-- FIREBASE COMPAT -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-<script>
-  // 🔥 TEU FIREBASE JÁ CORRIGIDO
-  const firebaseConfig = {
-    apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
-    authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
-    projectId: "preparatoriovirtualcomdelta",
-    storageBucket: "preparatoriovirtualcomdelta.firebasestorage.app",
-    messagingSenderId: "554101533814",
-    appId: "1:554101533814:web:ed46583d92f4e14679c357"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  function msg(t){
-    document.getElementById("msg").innerText = t;
-  }
-
-  // 👤 REGISTO
-  function register() {
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
-
-    auth.createUserWithEmailAndPassword(email, password)
-      .then(async (user) => {
-
-        await db.collection("users").doc(user.user.uid).set({
-          email: email,
-          estado: "pendente"
-        });
-
-        msg("Conta criada ⏳ Aguarde aprovação");
-
-      })
-      .catch(err => msg(err.message));
-  }
-
-  // 🔐 LOGIN
-  function login() {
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
-
-    auth.signInWithEmailAndPassword(email, password)
-      .then(async (user) => {
-
-        let doc = await db.collection("users").doc(user.user.uid).get();
-
-        if (!doc.exists) {
-          msg("Conta não encontrada");
-          return;
-        }
-
-        let data = doc.data();
-
-        if (data.estado === "aprovado") {
-          msg("Acesso permitido ✔");
-          window.location.href = "home.html";
-        } else {
-          msg("Ainda não aprovado ⏳");
-          auth.signOut();
-        }
-
-      })
-      .catch(err => msg(err.message));
-  }
-
-</script>
-
+</div>
+<div style="background:#1f2937;padding:10px;border-radius:10px;margin:10px 0;">
+<p><b>Pagamento via IBAN:</b></p>
+<p>0040 0000 5071 201</p>
+<p>Envie comprovativo para aprovação</p>
+</div>
 </body>
 </html>
