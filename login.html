@@ -16,7 +16,6 @@ align-items:center;
 height:100vh;
 }
 
-/* ZOOM MAIOR DA TELA */
 .box{
 background:rgba(255,255,255,0.08);
 padding:90px 60px;
@@ -25,17 +24,14 @@ width:520px;
 box-shadow:0 30px 100px rgba(0,0,0,0.8);
 backdrop-filter:blur(15px);
 text-align:center;
-transform:scale(1.1); /* 🔥 ZOOM MAIOR */
-animation:fadeIn 0.8s ease;
+transform:scale(1.1);
 }
 
 h2{
 font-size:38px;
 margin-bottom:30px;
-letter-spacing:1px;
 }
 
-/* INPUTS */
 input{
 padding:18px;
 margin:10px 0;
@@ -48,22 +44,15 @@ background:#f1f5f9;
 color:black;
 }
 
-/* PASSWORD BOX */
-.passwordBox{
-position:relative;
+select{
+padding:18px;
+margin:10px 0;
+width:100%;
+border-radius:12px;
+border:none;
+font-size:16px;
 }
 
-.eye{
-position:absolute;
-right:15px;
-top:50%;
-transform:translateY(-50%);
-cursor:pointer;
-font-size:18px;
-color:#333;
-}
-
-/* BOTÃO */
 button{
 padding:18px;
 width:100%;
@@ -74,8 +63,8 @@ color:white;
 cursor:pointer;
 font-size:18px;
 font-weight:bold;
-transition:0.3s;
 margin-top:10px;
+transition:0.3s;
 }
 
 button:hover{
@@ -88,21 +77,6 @@ margin-top:15px;
 font-size:14px;
 font-weight:bold;
 }
-
-/* ANIMAÇÃO */
-@keyframes fadeIn{
-from{opacity:0; transform:translateY(30px) scale(0.9);}
-to{opacity:1; transform:translateY(0) scale(1);}
-}
-
-/* RESPONSIVO */
-@media(max-width:600px){
-.box{
-width:90%;
-transform:scale(1);
-padding:50px 25px;
-}
-}
 </style>
 </head>
 
@@ -112,12 +86,19 @@ padding:50px 25px;
 
 <h2>Login do Aluno</h2>
 
-<input id="email" placeholder="Email"><br>
+<input id="email" placeholder="Email">
 
-<div class="passwordBox">
 <input id="senha" type="password" placeholder="Senha">
-<span class="eye" onclick="togglePassword()">👁</span>
-</div>
+
+<!-- ÁREA DO CURSO -->
+<select id="area">
+<option value="">Seleciona a área</option>
+<option value="medicina">Medicina</option>
+<option value="enfermagem">Enfermagem</option>
+<option value="farmacia">Farmácia</option>
+<option value="direito">Direito</option>
+<option value="engenharia">Engenharia</option>
+</select>
 
 <button onclick="login()">Entrar</button>
 
@@ -125,8 +106,8 @@ padding:50px 25px;
 
 </div>
 
-<!-- FIREBASE -->
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -144,15 +125,19 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const params = new URLSearchParams(window.location.search);
-const area = params.get("area");
-
 window.login = function(){
 
 const email = document.getElementById("email").value;
 const senha = document.getElementById("senha").value;
+const area = document.getElementById("area").value;
 
 document.getElementById("erro").innerText = "";
+
+// validação básica
+if(!email || !senha || !area){
+document.getElementById("erro").innerText = "Preenche todos os campos";
+return;
+}
 
 signInWithEmailAndPassword(auth, email, senha)
 .then(async (userCredential) => {
@@ -163,7 +148,7 @@ const ref = doc(db, "users", user.uid);
 const snap = await getDoc(ref);
 
 if (!snap.exists()) {
-document.getElementById("erro").innerText = "Conta não existe no sistema do admin";
+document.getElementById("erro").innerText = "Conta não existe no sistema";
 return;
 }
 
@@ -172,9 +157,11 @@ document.getElementById("erro").innerText = "Aguardando aprovação do admin";
 return;
 }
 
+// GUARDA DADOS DO ALUNO
 localStorage.setItem("user", email);
+localStorage.setItem("area", area);
 
-window.location.href = "aulas.html?area=" + area;
+window.location.href = "aulas.html";
 
 })
 .catch(() => {
@@ -183,11 +170,6 @@ document.getElementById("erro").innerText = "Email ou senha inválidos";
 
 }
 
-/* 👁 VER / OCULTAR SENHA */
-window.togglePassword = function(){
-const senha = document.getElementById("senha");
-senha.type = senha.type === "password" ? "text" : "password";
-}
 </script>
 
 </body>
