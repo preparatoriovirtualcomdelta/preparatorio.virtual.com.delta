@@ -11,16 +11,36 @@ font-family:Arial;
 background:#0f172a;
 color:white;
 padding:30px;
-}
-
-h1{
 text-align:center;
-margin-bottom:30px;
 }
 
+/* LOGIN */
+.login{
+margin-top:100px;
+}
+
+input{
+padding:12px;
+width:300px;
+border-radius:8px;
+border:none;
+}
+
+button{
+padding:10px 20px;
+margin-top:10px;
+border:none;
+border-radius:8px;
+background:#22c55e;
+color:white;
+cursor:pointer;
+}
+
+/* PAINEL */
 .container{
 max-width:900px;
 margin:auto;
+display:none;
 }
 
 .card{
@@ -33,10 +53,6 @@ justify-content:space-between;
 align-items:center;
 }
 
-.email{
-font-weight:bold;
-}
-
 .status{
 padding:5px 10px;
 border-radius:6px;
@@ -46,31 +62,40 @@ font-size:13px;
 .ok{background:green;}
 .no{background:red;}
 
-button{
+.approve{
+background:#22c55e;
+color:white;
 padding:8px 12px;
 border:none;
 border-radius:6px;
 cursor:pointer;
-font-weight:bold;
-}
-
-.approve{
-background:#22c55e;
-color:white;
-}
-
-.remove{
-background:#ef4444;
-color:white;
 }
 </style>
 </head>
 
 <body>
 
+<!-- LOGIN ADMIN -->
+<div class="login" id="loginBox">
+
+<h2>Acesso Admin</h2>
+
+<input type="password" id="senhaAdmin" placeholder="Digite a senha"><br>
+
+<button onclick="entrar()">Entrar</button>
+
+<p id="erro" style="color:red;"></p>
+
+</div>
+
+<!-- PAINEL -->
+<div class="container" id="painel">
+
 <h1>Painel Admin DELT∆</h1>
 
-<div class="container" id="lista"></div>
+<div id="lista"></div>
+
+</div>
 
 <script type="module">
 
@@ -91,6 +116,28 @@ const db = getFirestore(app);
 
 const lista = document.getElementById("lista");
 
+// 🔐 SENHA ÚNICA
+const SENHA = "12345678910xxxDelt∆xxxLoginwwwPermissãoFormulas17$";
+
+// LOGIN ADMIN
+window.entrar = function(){
+
+const senha = document.getElementById("senhaAdmin").value;
+
+if(senha === SENHA){
+
+document.getElementById("loginBox").style.display = "none";
+document.getElementById("painel").style.display = "block";
+
+loadUsers();
+
+}else{
+document.getElementById("erro").innerText = "Senha incorreta";
+}
+
+}
+
+// CARREGAR USUÁRIOS
 async function loadUsers(){
 
 lista.innerHTML = "";
@@ -106,15 +153,13 @@ div.className = "card";
 
 div.innerHTML = `
 <div>
-<div class="email">${data.email || "Sem email"}</div>
-<div class="status ${data.approved ? "ok" : "no"}">
+<b>${data.email || "Sem email"}</b><br>
+<span class="status ${data.approved ? "ok" : "no"}">
 ${data.approved ? "APROVADO" : "PENDENTE"}
-</div>
+</span>
 </div>
 
-<div>
 <button class="approve">Aprovar</button>
-</div>
 `;
 
 div.querySelector(".approve").onclick = async () => {
@@ -131,8 +176,6 @@ lista.appendChild(div);
 });
 
 }
-
-loadUsers();
 
 </script>
 
