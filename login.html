@@ -106,14 +106,14 @@ margin:auto;
 
 <select id="area">
 <option value="">Seleciona área</option>
-<option value="medicina geral">Medicina Geral</option>
+<option value="medicina-geral">Medicina Geral</option>
 <option value="enfermagem">Enfermagem</option>
 <option value="farmacia">Farmácia</option>
-<option value="analises clinicas">Análises Clínicas</option>
+<option value="analises-clinicas">Análises Clínicas</option>
 <option value="fisioterapia">Fisioterapia</option>
-<option value="nutrição e dietética">Nutrição e Dietética</option>
+<option value="nutricao">Nutrição e Dietética</option>
 <option value="cardiopneumologia">Cardiopneumologia</option>
-<option value="medicina dentária">Medicina Dentária</option>
+<option value="medicina-dentaria">Medicina Dentária</option>
 </select>
 
 <button id="btnLogin" class="loginBtn" onclick="login()">Entrar</button>
@@ -152,7 +152,7 @@ const loading = document.getElementById("loading");
 const btnLogin = document.getElementById("btnLogin");
 const btnRegister = document.getElementById("btnRegister");
 
-// 🔥 pegar área do index automaticamente
+// área do index
 const params = new URLSearchParams(window.location.search);
 const areaURL = params.get("area");
 if(areaURL){
@@ -195,7 +195,7 @@ showLoading();
 try {
 
 const userCredential = await signInWithEmailAndPassword(auth, email, senha);
-await verificar(userCredential.user, email);
+await verificar(userCredential.user);
 
 } catch(error){
 erro.innerText = "Email ou senha inválidos ou conta não existe";
@@ -205,7 +205,7 @@ hideLoading();
 
 }
 
-// REGISTO (FIRESTORE CORRIGIDO)
+// REGISTO
 window.register = async function(){
 
 const email = document.getElementById("email").value;
@@ -222,8 +222,10 @@ try {
 
 const newUser = await createUserWithEmailAndPassword(auth, email, senha);
 
-await setDoc(doc(db,"users",auth.currentUser.uid),{
-uid: auth.currentUser.uid,
+const uid = newUser.user.uid;
+
+await setDoc(doc(db,"users",uid),{
+uid: uid,
 email: email,
 area: area,
 approved: false,
@@ -242,8 +244,8 @@ hideLoading();
 
 }
 
-// VERIFICAÇÃO
-async function verificar(user, email){
+// VERIFICAÇÃO DE APROVAÇÃO
+async function verificar(user){
 
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
@@ -253,13 +255,15 @@ erro.innerText = "Conta não configurada";
 return;
 }
 
-if(snap.data().approved !== true){
+const data = snap.data();
+
+if(!data.approved){
 erro.innerText = "Aguardando aprovação do admin";
 return;
 }
 
-localStorage.setItem("user", email);
-localStorage.setItem("area", snap.data().area);
+localStorage.setItem("user", user.email);
+localStorage.setItem("area", data.area);
 
 window.location.href = "aulas.html";
 }
