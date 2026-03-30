@@ -18,7 +18,7 @@ color:white;
 
 .box{
 background:rgba(255,255,255,0.08);
-padding:70px;
+padding:60px;
 border-radius:25px;
 width:420px;
 text-align:center;
@@ -43,7 +43,6 @@ right:15px;
 top:50%;
 transform:translateY(-50%);
 cursor:pointer;
-color:black;
 }
 
 button{
@@ -51,15 +50,44 @@ width:100%;
 padding:15px;
 border:none;
 border-radius:10px;
-background:#22c55e;
 color:white;
 font-size:18px;
 cursor:pointer;
+margin-top:10px;
+}
+
+.loginBtn{background:#22c55e;}
+.registerBtn{background:#3b82f6;}
+
+button:disabled{
+opacity:0.6;
+cursor:not-allowed;
 }
 
 .error{
 color:red;
 margin-top:10px;
+}
+
+/* 🔥 LOADING */
+#loading{
+display:none;
+margin-top:15px;
+}
+
+.spinner{
+width:30px;
+height:30px;
+border:4px solid #ccc;
+border-top:4px solid #22c55e;
+border-radius:50%;
+animation:spin 1s linear infinite;
+margin:auto;
+}
+
+@keyframes spin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
 }
 </style>
 </head>
@@ -89,7 +117,13 @@ margin-top:10px;
 <option value="medicina dentária">Medicina Dentária</option>
 </select>
 
-<button onclick="login()">Entrar</button>
+<button id="btnLogin" class="loginBtn" onclick="login()">Entrar</button>
+<button id="btnRegister" class="registerBtn" onclick="register()">Criar conta</button>
+
+<div id="loading">
+<div class="spinner"></div>
+<p>A carregar...</p>
+</div>
 
 <div class="error" id="erro"></div>
 
@@ -114,29 +148,73 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+const erro = document.getElementById("erro");
+const loading = document.getElementById("loading");
+const btnLogin = document.getElementById("btnLogin");
+const btnRegister = document.getElementById("btnRegister");
+
+function showLoading(){
+loading.style.display = "block";
+btnLogin.disabled = true;
+btnRegister.disabled = true;
+}
+
+function hideLoading(){
+loading.style.display = "none";
+btnLogin.disabled = false;
+btnRegister.disabled = false;
+}
+
+function validar(email, senha, area){
+if(!email || !senha || !area){
+erro.innerText = "Preenche todos os campos";
+return false;
+}
+return true;
+}
+
+// 🔐 LOGIN
 window.login = async function(){
 
 const email = document.getElementById("email").value;
 const senha = document.getElementById("senha").value;
 const area = document.getElementById("area").value;
 
-document.getElementById("erro").innerText = "";
+erro.innerText = "";
 
-if(!email || !senha || !area){
-document.getElementById("erro").innerText = "Preenche todos os campos";
-return;
-}
+if(!validar(email, senha, area)) return;
+
+showLoading();
 
 try {
 
-// 🔥 TENTA LOGIN
 const userCredential = await signInWithEmailAndPassword(auth, email, senha);
-await verificar(userCredential.user, email, area);
+
+await verificar(userCredential.user, email);
 
 } catch(error){
 
-// 🔥 SE NÃO EXISTIR → CRIA CONTA
-if(error.code === "auth/user-not-found"){
+erro.innerText = "Email ou senha inválidos ou conta não existe";
+} finally {
+hideLoading();
+}
+
+}
+
+// 🆕 REGISTO
+window.register = async function(){
+
+const email = document.getElementById("email").value;
+const senha = document.getElementById("senha").value;
+const area = document.getElementById("area").value;
+
+erro.innerText = "";
+
+if(!validar(email, senha, area)) return;
+
+showLoading();
+
+try {
 
 const newUser = await createUserWithEmailAndPassword(auth, email, senha);
 
@@ -146,34 +224,30 @@ area: area,
 approved: false
 });
 
-document.getElementById("erro").innerText = "Conta criada. Aguarde aprovação do admin";
-return;
+erro.innerText = "Conta criada! Aguarde aprovação do admin";
+
+} catch(error){
+
+erro.innerText = "Erro ao criar conta";
+} finally {
+hideLoading();
+}
 
 }
 
-document.getElementById("erro").innerText = "Email ou senha inválidos";
-}
-
-}
-
-// 🔥 VERIFICA FIRESTORE
-async function verificar(user, email, area){
+// 🔎 VERIFICAÇÃO
+async function verificar(user, email){
 
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 if(!snap.exists()){
-await setDoc(ref,{
-email: email,
-area: area,
-approved: false
-});
-document.getElementById("erro").innerText = "Conta criada. Aguarde aprovação";
+erro.innerText = "Conta não configurada";
 return;
 }
 
 if(snap.data().approved !== true){
-document.getElementById("erro").innerText = "Aguardando aprovação";
+erro.innerText = "Aguardando aprovação do admin";
 return;
 }
 
@@ -181,10 +255,9 @@ localStorage.setItem("user", email);
 localStorage.setItem("area", snap.data().area);
 
 window.location.href = "aulas.html";
-
 }
 
-// 👁 mostrar/ocultar senha
+// 👁 senha
 window.toggleSenha = function(){
 const senha = document.getElementById("senha");
 senha.type = senha.type === "password" ? "text" : "password";
@@ -193,4 +266,4 @@ senha.type = senha.type === "password" ? "text" : "password";
 </script>
 
 </body>
-  </html>
+</html>
