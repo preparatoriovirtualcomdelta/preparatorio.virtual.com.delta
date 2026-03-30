@@ -195,13 +195,14 @@ await verificar(userCredential.user, email);
 } catch(error){
 
 erro.innerText = "Email ou senha inválidos ou conta não existe";
+
 } finally {
 hideLoading();
 }
 
 }
 
-// 🆕 REGISTO
+// 🆕 REGISTO (FIRESTORE CORRIGIDO)
 window.register = async function(){
 
 const email = document.getElementById("email").value;
@@ -216,19 +217,26 @@ showLoading();
 
 try {
 
+// 🔐 AUTH
 const newUser = await createUserWithEmailAndPassword(auth, email, senha);
 
+// 🔥 FIRESTORE CORRIGIDO
 await setDoc(doc(db,"users",newUser.user.uid),{
+uid: newUser.user.uid,
 email: email,
 area: area,
-approved: false
+approved: false,
+createdAt: Date.now()
 });
 
+erro.style.color = "lightgreen";
 erro.innerText = "Conta criada! Aguarde aprovação do admin";
 
 } catch(error){
 
-erro.innerText = "Erro ao criar conta";
+erro.style.color = "red";
+erro.innerText = "Erro: " + error.message;
+
 } finally {
 hideLoading();
 }
