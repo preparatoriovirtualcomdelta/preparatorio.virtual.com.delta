@@ -1,172 +1,221 @@
-<!DOCTYPE html>  <html>  
-<head>  
-<meta charset="UTF-8">  
-<title>PREPARATÓRIO VIRTUAL COM DELT∆</title>  <style>  
-body{  
-margin:0;  
-font-family:Arial, sans-serif;  
-background:linear-gradient(135deg,#0f172a,#1e293b,#0f172a);  
-color:white;  
-text-align:center;  
-overflow-x:hidden;  
-}  
-  
-/* MENU */  
-.menu{  
-display:flex;  
-justify-content:space-between;  
-padding:18px 25px;  
-background:rgba(0,0,0,0.6);  
-backdrop-filter:blur(10px);  
-position:sticky;  
-top:0;  
-}  
-  
-.menu div{  
-font-weight:bold;  
-letter-spacing:1px;  
-}  
-  
-/* HEADER */  
-.header{  
-padding:40px 20px;  
-animation:fadeIn 1s ease;  
-}  
-  
-h1{  
-font-size:40px;  
-margin-bottom:10px;  
-}  
-  
-.subtitle{  
-font-size:20px;  
-opacity:0.85;  
-}  
-  
-.price{  
-margin-top:10px;  
-font-size:26px;  
-font-weight:bold;  
-color:#00ff88;  
-}  
-  
-.info{  
-margin-top:10px;  
-font-size:16px;  
-opacity:0.9;  
-}  
-  
-/* CONTACT */  
-.contact{  
-margin-top:20px;  
-}  
-  
-button{  
-padding:12px 22px;  
-margin:5px;  
-cursor:pointer;  
-border:none;  
-border-radius:10px;  
-font-size:14px;  
-transition:0.3s;  
-}  
-  
-button:hover{  
-transform:scale(1.05);  
-}  
-  
-.whatsapp{  
-background:#25D366;  
-color:white;  
-}  
-  
-.email{  
-background:#3b82f6;  
-color:white;  
-}  
-  
-/* CARDS */  
-.cards{  
-display:flex;  
-flex-wrap:wrap;  
-justify-content:center;  
-margin-top:50px;  
-gap:20px;  
-padding:20px;  
-}  
-  
-.card{  
-background:rgba(255,255,255,0.95);  
-color:black;  
-padding:45px 30px;  
-width:220px;  
-border-radius:18px;  
-font-size:18px;  
-font-weight:bold;  
-cursor:pointer;  
-transition:0.4s;  
-box-shadow:0 10px 30px rgba(0,0,0,0.3);  
-animation:slideUp 0.6s ease;  
-}  
-  
-.card:hover{  
-transform:translateY(-10px) scale(1.05);  
-background:#00ff88;  
-color:black;  
-}  
-  
-/* ANIMAÇÕES */  
-@keyframes fadeIn{  
-from{opacity:0}  
-to{opacity:1}  
-}  
-  
-@keyframes slideUp{  
-from{  
-opacity:0;  
-transform:translateY(40px);  
-}  
-to{  
-opacity:1;  
-transform:translateY(0);  
-}  
-}  
-  
-/* RESPONSIVO */  
-@media(max-width:768px){  
-h1{font-size:30px;}  
-.card{width:80%;}  
-}  
-</style>  </head>  <body>  <div class="menu">  
-<div>PREPARATÓRIO VIRTUAL COM DELT∆</div>  
-<a href="admin.html" style="color:white;text-decoration:none;font-weight:bold;">ADMIN</a>  
-</div>  <div class="header">  <h1>ÁREAS DE FORMAÇÃO</h1>  <div class="subtitle">  
-Medicina e Ciências da Saúde  
-</div>  <div class="price">  
-Preço: 5.000 KZ  
-</div>  <div class="info">  
-IBAN: AO06 0040 0000 5071 2010 1017 8<br>  
-Proprietário: MPEKO CRUZ  
-</div>  <div class="contact">  <a href="https://wa.me/244950509560?text=Olá%2C%20quero%20enviar%20o%20meu%20comprovativo%20de%20pagamento%20do%20Preparatório%20Virtual." target="_blank">  
-<button class="whatsapp">WhatsApp</button>  
-</a>  <a href="mailto:deltaigualb.bmenos4.a.c@gmail.com?subject=Comprovativo%20de%20Pagamento%20-%20Preparatório%20Virtual&body=Olá,%0D%0A%0D%0AEstou a enviar o meu comprovativo de pagamento.%0D%0A%0D%0ANome:%0D%0AÁrea escolhida:%0D%0A%0D%0AObrigado.">  
-<button class="email">Email</button>  
-</a>  </div>  </div>  <div class="cards">  <a href="login.html?area=medicina geral">  
-<div class="card">Medicina Geral</div>  
-</a>  <a href="login.html?area=enfermagem">  
-<div class="card">Enfermagem</div>  
-</a>  <a href="login.html?area=farmacia">  
-<div class="card">Farmácia</div>  
-</a>  <a href="login.html?area=fisioterapia">  
-<div class="card">Fisioterapia</div>  
-</a>  <a href="login.html?area=analises clinicas">
-<div class="card">Análises Clínicas</div>  
-</a>  <a href="login.html?area=nutricao">  
-<div class="card">Nutrição e Dietética</div>  
-</a>  <a href="login.html?area=cardiopneumologia">  
-<div class="card">Cardiopneumologia</div>  
-</a>  
-<a href="login.html?area=medicina dentária">  
-<div class="card">Medicina Dentária</div>  
-</a>  </div>  </body>  
-</html>  
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PREPARATÓRIO VIRTUAL COM DELT∆</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:linear-gradient(135deg,#0f172a,#1e293b,#0f172a);
+color:white;
+text-align:center;
+overflow-x:hidden;
+}
+
+/* MENU */
+.menu{
+display:flex;
+justify-content:space-between;
+padding:18px 25px;
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(10px);
+position:sticky;
+top:0;
+}
+
+.menu div{
+font-weight:bold;
+letter-spacing:1px;
+}
+
+/* HEADER */
+.header{
+padding:40px 20px;
+animation:fadeIn 1s ease;
+}
+
+h1{
+font-size:40px;
+margin-bottom:10px;
+}
+
+.subtitle{
+font-size:20px;
+opacity:0.85;
+}
+
+.price{
+margin-top:10px;
+font-size:26px;
+font-weight:bold;
+color:#00ff88;
+}
+
+.info{
+margin-top:10px;
+font-size:16px;
+opacity:0.9;
+}
+
+/* CONTACT */
+.contact{
+margin-top:20px;
+}
+
+button{
+padding:12px 22px;
+margin:5px;
+cursor:pointer;
+border:none;
+border-radius:10px;
+font-size:14px;
+transition:0.3s;
+}
+
+button:hover{
+transform:scale(1.05);
+}
+
+.whatsapp{
+background:#25D366;
+color:white;
+}
+
+.email{
+background:#3b82f6;
+color:white;
+}
+
+/* CARDS */
+.cards{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+margin-top:50px;
+gap:20px;
+padding:20px;
+}
+
+.card{
+background:rgba(255,255,255,0.95);
+color:black;
+padding:45px 30px;
+width:220px;
+border-radius:18px;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+transition:0.4s;
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
+animation:slideUp 0.6s ease;
+}
+
+.card:hover{
+transform:translateY(-10px) scale(1.05);
+background:#00ff88;
+color:black;
+}
+
+/* ANIMAÇÕES */
+@keyframes fadeIn{
+from{opacity:0}
+to{opacity:1}
+}
+
+@keyframes slideUp{
+from{
+opacity:0;
+transform:translateY(40px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+/* RESPONSIVO */
+@media(max-width:768px){
+h1{font-size:30px;}
+.card{width:80%;}
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="menu">
+<div>PREPARATÓRIO VIRTUAL COM DELT∆</div>
+<a href="admin.html" style="color:white;text-decoration:none;font-weight:bold;">ADMIN</a>
+</div>
+
+<div class="header">
+
+<h1>ÁREAS DE FORMAÇÃO</h1>
+
+<div class="subtitle">
+Medicina e Ciências da Saúde
+</div>
+
+<div class="price">
+Preço: 5.000 KZ
+</div>
+
+<div class="info">
+IBAN: AO06 0040 0000 5071 2010 1017 8<br>
+Proprietário: MPEKO CRUZ
+</div>
+
+<div class="contact">
+
+<a href="https://wa.me/244950509560?text=Olá%2C%20quero%20enviar%20o%20meu%20comprovativo%20de%20pagamento%20do%20Preparatório%20Virtual." target="_blank">
+<button class="whatsapp">WhatsApp</button>
+</a>
+
+<a href="mailto:deltaigualb.bmenos4.a.c@gmail.com?subject=Comprovativo%20de%20Pagamento%20-%20Preparatório%20Virtual&body=Olá,%0D%0A%0D%0AEstou a enviar o meu comprovativo de pagamento.%0D%0A%0D%0ANome:%0D%0AÁrea escolhida:%0D%0A%0D%0AObrigado.">
+<button class="email">Email</button>
+</a>
+
+</div>
+</div>
+
+<div class="cards">
+
+<a href="login.html?area=medicina-geral">
+<div class="card">Medicina Geral</div>
+</a>
+
+<a href="login.html?area=enfermagem">
+<div class="card">Enfermagem</div>
+</a>
+
+<a href="login.html?area=farmacia">
+<div class="card">Farmácia</div>
+</a>
+
+<a href="login.html?area=fisioterapia">
+<div class="card">Fisioterapia</div>
+</a>
+
+<a href="login.html?area=analises-clinicas">
+<div class="card">Análises Clínicas</div>
+</a>
+
+<a href="login.html?area=nutricao">
+<div class="card">Nutrição e Dietética</div>
+</a>
+
+<a href="login.html?area=cardiopneumologia">
+<div class="card">Cardiopneumologia</div>
+</a>
+
+<a href="login.html?area=medicina-dentaria">
+<div class="card">Medicina Dentária</div>
+</a>
+
+</div>
+
+</body>
+</html>
