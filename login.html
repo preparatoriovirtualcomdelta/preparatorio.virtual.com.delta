@@ -69,7 +69,6 @@ color:red;
 margin-top:10px;
 }
 
-/* 🔥 LOADING */
 #loading{
 display:none;
 margin-top:15px;
@@ -153,6 +152,13 @@ const loading = document.getElementById("loading");
 const btnLogin = document.getElementById("btnLogin");
 const btnRegister = document.getElementById("btnRegister");
 
+// 🔥 pegar área do index automaticamente
+const params = new URLSearchParams(window.location.search);
+const areaURL = params.get("area");
+if(areaURL){
+document.getElementById("area").value = areaURL;
+}
+
 function showLoading(){
 loading.style.display = "block";
 btnLogin.disabled = true;
@@ -173,7 +179,7 @@ return false;
 return true;
 }
 
-// 🔐 LOGIN
+// LOGIN
 window.login = async function(){
 
 const email = document.getElementById("email").value;
@@ -189,20 +195,17 @@ showLoading();
 try {
 
 const userCredential = await signInWithEmailAndPassword(auth, email, senha);
-
 await verificar(userCredential.user, email);
 
 } catch(error){
-
 erro.innerText = "Email ou senha inválidos ou conta não existe";
-
 } finally {
 hideLoading();
 }
 
 }
 
-// 🆕 REGISTO (FIRESTORE CORRIGIDO)
+// REGISTO (FIRESTORE CORRIGIDO)
 window.register = async function(){
 
 const email = document.getElementById("email").value;
@@ -217,12 +220,10 @@ showLoading();
 
 try {
 
-// 🔐 AUTH
 const newUser = await createUserWithEmailAndPassword(auth, email, senha);
 
-// 🔥 FIRESTORE CORRIGIDO
-await setDoc(doc(db,"users",newUser.user.uid),{
-uid: newUser.user.uid,
+await setDoc(doc(db,"users",auth.currentUser.uid),{
+uid: auth.currentUser.uid,
 email: email,
 area: area,
 approved: false,
@@ -233,17 +234,15 @@ erro.style.color = "lightgreen";
 erro.innerText = "Conta criada! Aguarde aprovação do admin";
 
 } catch(error){
-
 erro.style.color = "red";
 erro.innerText = "Erro: " + error.message;
-
 } finally {
 hideLoading();
 }
 
 }
 
-// 🔎 VERIFICAÇÃO
+// VERIFICAÇÃO
 async function verificar(user, email){
 
 const ref = doc(db,"users",user.uid);
@@ -265,7 +264,7 @@ localStorage.setItem("area", snap.data().area);
 window.location.href = "aulas.html";
 }
 
-// 👁 senha
+// mostrar senha
 window.toggleSenha = function(){
 const senha = document.getElementById("senha");
 senha.type = senha.type === "password" ? "text" : "password";
