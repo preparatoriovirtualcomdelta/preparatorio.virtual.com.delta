@@ -2,219 +2,275 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>PREPARATÓRIO VIRTUAL COM DELT∆</title>
+<title>LOGIN - DELT∆</title>
 
 <style>
 body{
 margin:0;
-font-family:Arial, sans-serif;
+font-family:Arial;
 background:linear-gradient(135deg,#0f172a,#1e293b,#0f172a);
-color:white;
-text-align:center;
-overflow-x:hidden;
-}
-
-/* MENU */
-.menu{
 display:flex;
-justify-content:space-between;
-padding:18px 25px;
-background:rgba(0,0,0,0.6);
-backdrop-filter:blur(10px);
-position:sticky;
-top:0;
+justify-content:center;
+align-items:center;
+height:100vh;
+color:white;
 }
 
-.menu div{
-font-weight:bold;
-letter-spacing:1px;
+.box{
+background:rgba(255,255,255,0.08);
+padding:60px;
+border-radius:25px;
+width:420px;
+text-align:center;
 }
 
-/* HEADER */
-.header{
-padding:40px 20px;
-animation:fadeIn 1s ease;
-}
-
-h1{
-font-size:40px;
-margin-bottom:10px;
-}
-
-.subtitle{
-font-size:20px;
-opacity:0.85;
-}
-
-.price{
-margin-top:10px;
-font-size:26px;
-font-weight:bold;
-color:#00ff88;
-}
-
-.info{
-margin-top:10px;
+input,select{
+width:100%;
+padding:15px;
+margin:10px 0;
+border-radius:10px;
+border:none;
 font-size:16px;
-opacity:0.9;
 }
 
-/* CONTACT */
-.contact{
-margin-top:20px;
+.passwordBox{
+position:relative;
+}
+
+.eye{
+position:absolute;
+right:15px;
+top:50%;
+transform:translateY(-50%);
+cursor:pointer;
 }
 
 button{
-padding:12px 22px;
-margin:5px;
-cursor:pointer;
+width:100%;
+padding:15px;
 border:none;
 border-radius:10px;
-font-size:14px;
-transition:0.3s;
-}
-
-button:hover{
-transform:scale(1.05);
-}
-
-.whatsapp{
-background:#25D366;
 color:white;
-}
-
-.email{
-background:#3b82f6;
-color:white;
-}
-
-/* CARDS */
-.cards{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-margin-top:50px;
-gap:20px;
-padding:20px;
-}
-
-.card{
-background:rgba(255,255,255,0.95);
-color:black;
-padding:45px 30px;
-width:220px;
-border-radius:18px;
 font-size:18px;
-font-weight:bold;
 cursor:pointer;
-transition:0.4s;
-box-shadow:0 10px 30px rgba(0,0,0,0.3);
-animation:slideUp 0.6s ease;
+margin-top:10px;
 }
 
-.card:hover{
-transform:translateY(-10px) scale(1.05);
-background:#00ff88;
-color:black;
+.loginBtn{background:#22c55e;}
+.registerBtn{background:#3b82f6;}
+
+button:disabled{
+opacity:0.6;
+cursor:not-allowed;
 }
 
-/* ANIMAÇÕES */
-@keyframes fadeIn{
-from{opacity:0}
-to{opacity:1}
+.error{
+color:red;
+margin-top:10px;
 }
 
-@keyframes slideUp{
-from{
-opacity:0;
-transform:translateY(40px);
-}
-to{
-opacity:1;
-transform:translateY(0);
-}
+#loading{
+display:none;
+margin-top:15px;
 }
 
-/* RESPONSIVO */
-@media(max-width:768px){
-h1{font-size:30px;}
-.card{width:80%;}
+.spinner{
+width:30px;
+height:30px;
+border:4px solid #ccc;
+border-top:4px solid #22c55e;
+border-radius:50%;
+animation:spin 1s linear infinite;
+margin:auto;
+}
+
+@keyframes spin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
 }
 </style>
 </head>
 
 <body>
 
-<div class="menu">
-<div>PREPARATÓRIO VIRTUAL COM DELT∆</div>
-<a href="admin.html" style="color:white;text-decoration:none;font-weight:bold;">ADMIN</a>
+<div class="box">
+
+<h2>Login</h2>
+
+<input id="email" placeholder="Email">
+
+<div class="passwordBox">
+<input id="senha" type="password" placeholder="Senha">
+<span class="eye" onclick="toggleSenha()">👁</span>
 </div>
 
-<div class="header">
+<select id="area">
+<option value="">Seleciona área</option>
+<option value="medicina geral">Medicina Geral</option>
+<option value="enfermagem">Enfermagem</option>
+<option value="farmacia">Farmácia</option>
+<option value="analises clinicas">Análises Clínicas</option>
+<option value="fisioterapia">Fisioterapia</option>
+<option value="nutrição e dietética">Nutrição e Dietética</option>
+<option value="cardiopneumologia">Cardiopneumologia</option>
+<option value="medicina dentária">Medicina Dentária</option>
+</select>
 
-<h1>ÁREAS DE FORMAÇÃO</h1>
+<button id="btnLogin" class="loginBtn" onclick="login()">Entrar</button>
+<button id="btnRegister" class="registerBtn" onclick="register()">Criar conta</button>
 
-<div class="subtitle">
-Medicina e Ciências da Saúde
+<div id="loading">
+<div class="spinner"></div>
+<p>A carregar...</p>
 </div>
 
-<div class="price">
-Preço: 5.000 KZ
-</div>
-
-<div class="info">
-IBAN: AO06 0040 0000 5071 2010 1017 8<br>
-Proprietário: MPEKO CRUZ
-</div>
-
-<div class="contact">
-
-<a href="https://wa.me/244950509560?text=Olá%2C%20quero%20enviar%20o%20meu%20comprovativo%20de%20pagamento%20do%20Preparatório%20Virtual." target="_blank">
-<button class="whatsapp">WhatsApp</button>
-</a>
-
-<a href="mailto:deltaigualb.bmenos4.a.c@gmail.com?subject=Comprovativo%20de%20Pagamento%20-%20Preparatório%20Virtual&body=Olá,%0D%0A%0D%0AEstou a enviar o meu comprovativo de pagamento.%0D%0A%0D%0ANome:%0D%0AÁrea escolhida:%0D%0A%0D%0AObrigado.">
-<button class="email">Email</button>
-</a>
+<div class="error" id="erro"></div>
 
 </div>
 
-</div>
+<script type="module">
 
-<div class="cards">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-<a href="login.html?area=medicina geral">
-<div class="card">Medicina Geral</div>
-</a>
+const firebaseConfig = {
+  apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
+  authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
+  projectId: "preparatoriovirtualcomdelta",
+  storageBucket: "preparatoriovirtualcomdelta.appspot.com",
+  messagingSenderId: "554101533814",
+  appId: "1:554101533814:web:ed46583d92f4e14679c357"
+};
 
-<a href="login.html?area=enfermagem">
-<div class="card">Enfermagem</div>
-</a>
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-<a href="login.html?area=farmacia">
-<div class="card">Farmácia</div>
-</a>
+const erro = document.getElementById("erro");
+const loading = document.getElementById("loading");
+const btnLogin = document.getElementById("btnLogin");
+const btnRegister = document.getElementById("btnRegister");
 
-<a href="login.html?area=fisioterapia">
-<div class="card">Fisioterapia</div>
-</a>
+// 🔥 pegar área do index automaticamente
+const params = new URLSearchParams(window.location.search);
+const areaURL = params.get("area");
+if(areaURL){
+document.getElementById("area").value = areaURL;
+}
 
-<a href="login.html?area=analises">
-<div class="card">Análises Clínicas</div>
-</a>
+function showLoading(){
+loading.style.display = "block";
+btnLogin.disabled = true;
+btnRegister.disabled = true;
+}
 
-<a href="login.html?area=nutricao">
-<div class="card">Nutrição e Dietética</div>
-</a>
+function hideLoading(){
+loading.style.display = "none";
+btnLogin.disabled = false;
+btnRegister.disabled = false;
+}
 
-<a href="login.html?area=cardiopneumologia">
-<div class="card">Cardiopneumologia</div>
-</a>
-<a href="login.html?area=medicina dentária">
-<div class="card">Medicina Dentária</div>
-</a>
-  
-</div>
+function validar(email, senha, area){
+if(!email || !senha || !area){
+erro.innerText = "Preenche todos os campos";
+return false;
+}
+return true;
+}
+
+// LOGIN
+window.login = async function(){
+
+const email = document.getElementById("email").value;
+const senha = document.getElementById("senha").value;
+const area = document.getElementById("area").value;
+
+erro.innerText = "";
+
+if(!validar(email, senha, area)) return;
+
+showLoading();
+
+try {
+
+const userCredential = await signInWithEmailAndPassword(auth, email, senha);
+await verificar(userCredential.user, email);
+
+} catch(error){
+erro.innerText = "Email ou senha inválidos ou conta não existe";
+} finally {
+hideLoading();
+}
+
+}
+
+// REGISTO (FIRESTORE CORRIGIDO)
+window.register = async function(){
+
+const email = document.getElementById("email").value;
+const senha = document.getElementById("senha").value;
+const area = document.getElementById("area").value;
+
+erro.innerText = "";
+
+if(!validar(email, senha, area)) return;
+
+showLoading();
+
+try {
+
+const newUser = await createUserWithEmailAndPassword(auth, email, senha);
+
+await setDoc(doc(db,"users",auth.currentUser.uid),{
+uid: auth.currentUser.uid,
+email: email,
+area: area,
+approved: false,
+createdAt: Date.now()
+});
+
+erro.style.color = "lightgreen";
+erro.innerText = "Conta criada! Aguarde aprovação do admin";
+
+} catch(error){
+erro.style.color = "red";
+erro.innerText = "Erro: " + error.message;
+} finally {
+hideLoading();
+}
+
+}
+
+// VERIFICAÇÃO
+async function verificar(user, email){
+
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+if(!snap.exists()){
+erro.innerText = "Conta não configurada";
+return;
+}
+
+if(snap.data().approved !== true){
+erro.innerText = "Aguardando aprovação do admin";
+return;
+}
+
+localStorage.setItem("user", email);
+localStorage.setItem("area", snap.data().area);
+
+window.location.href = "aulas.html";
+}
+
+// mostrar senha
+window.toggleSenha = function(){
+const senha = document.getElementById("senha");
+senha.type = senha.type === "password" ? "text" : "password";
+}
+
+</script>
 
 </body>
 </html>
