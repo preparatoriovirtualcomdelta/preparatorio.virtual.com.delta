@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>AULAS - DELT∆</title>
+<title>AULAS</title>
 
 <style>
 body{
@@ -12,65 +12,43 @@ background:#0f172a;
 color:white;
 }
 
-.header{
-padding:20px;
-background:#020617;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
 .container{
 padding:20px;
 }
 
 .card{
 background:#1e293b;
-padding:20px;
+padding:15px;
 margin:15px 0;
-border-radius:15px;
-}
-
-video{
-width:100%;
 border-radius:10px;
-margin-top:10px;
 }
 
-a.download{
-display:inline-block;
-margin-top:10px;
-padding:10px;
-background:#22c55e;
-color:white;
-border-radius:8px;
-text-decoration:none;
+a{
+color:#22c55e;
 }
 </style>
 </head>
 
-<body>
+<body oncontextmenu="return false;">
 
-<div class="header">
-<h2>Área: <span id="area"></span></h2>
-<button onclick="logout()">Sair</button>
+<div class="container">
+<h2 id="area"></h2>
+<div id="lista"></div>
 </div>
-
-<div class="container" id="lista"></div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
-  authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
-  projectId: "preparatoriovirtualcomdelta",
-  storageBucket: "preparatoriovirtualcomdelta.appspot.com",
-  messagingSenderId: "554101533814",
-  appId: "1:554101533814:web:ed46583d92f4e14679c357"
+  apiKey: "AIzaSyDoF_h5rVPvVFsHJNcXdWO1gkzwdm65pZQ",
+  authDomain: "preparatoriovirtualcomde-71e23.firebaseapp.com",
+  projectId: "preparatoriovirtualcomde-71e23",
+  storageBucket: "preparatoriovirtualcomde-71e23.firebasestorage.app",
+  messagingSenderId: "738659946479",
+  appId: "1:738659946479:web:882735f1e23b5d0764b01a"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -80,28 +58,23 @@ const db = getFirestore(app);
 const lista = document.getElementById("lista");
 const areaUser = localStorage.getItem("area");
 
-// mostrar área
-document.getElementById("area").innerText = areaUser;
+document.getElementById("area").innerText = "Área: " + areaUser;
 
-// 🔐 PROTEÇÃO LOGIN
-onAuthStateChanged(auth, async (user)=>{
+// 🔐 PROTEÇÃO
+onAuthStateChanged(auth, (user)=>{
 if(!user){
 window.location.href = "login.html";
 return;
 }
-
-carregarAulas();
+carregar();
 });
 
 // 🚀 CARREGAR AULAS
-async function carregarAulas(){
-
-lista.innerHTML = "";
+async function carregar(){
 
 const snap = await getDocs(collection(db,"aulas"));
 
 snap.forEach(docu=>{
-
 const data = docu.data();
 
 if(data.area !== areaUser) return;
@@ -109,55 +82,40 @@ if(data.area !== areaUser) return;
 const div = document.createElement("div");
 div.className = "card";
 
-let conteudo = `<h3>${data.titulo}</h3>`;
+let html = `<h3>${data.titulo}</h3>`;
 
-// 🎥 VIDEO (YouTube embed)
+// 🎥 VIDEO (SEM DOWNLOAD)
 if(data.tipo === "video"){
-
-conteudo += `
-<iframe width="100%" height="250"
-src="${data.url.replace("watch?v=","embed/")}"
-frameborder="0" allowfullscreen></iframe>
+html += `
+<iframe 
+src="${data.url}" 
+width="100%" 
+height="250"
+allow="autoplay"
+oncontextmenu="return false;">
+</iframe>
 `;
-
 }
 
 // 📄 PDF
 if(data.tipo === "pdf"){
-
-conteudo += `
-<a class="download" href="${data.url}" target="_blank">
-📄 Baixar PDF
-</a>
-`;
-
+html += `<a href="${data.url}" target="_blank">📄 Baixar PDF</a>`;
 }
 
 // 🖼 IMAGEM
 if(data.tipo === "imagem"){
-
-conteudo += `
+html += `
 <img src="${data.url}" width="100%">
 <br>
-<a class="download" href="${data.url}" download>
-📥 Baixar imagem
-</a>
+<a href="${data.url}" download>📥 Baixar imagem</a>
 `;
-
 }
 
-div.innerHTML = conteudo;
+div.innerHTML = html;
 lista.appendChild(div);
 
 });
 
-}
-
-// 🚪 LOGOUT
-window.logout = function(){
-signOut(auth);
-localStorage.clear();
-window.location.href = "login.html";
 }
 
 </script>
