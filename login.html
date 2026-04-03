@@ -106,14 +106,14 @@ margin:auto;
 
 <select id="area">
 <option value="">Seleciona área</option>
-<option value="medicina-geral">Medicina Geral</option>
+<option value="medicina geral">Medicina Geral</option>
 <option value="enfermagem">Enfermagem</option>
 <option value="farmacia">Farmácia</option>
-<option value="analises-clinicas">Análises Clínicas</option>
+<option value="analises clinicas">Análises Clínicas</option>
 <option value="fisioterapia">Fisioterapia</option>
-<option value="nutricao">Nutrição e Dietética</option>
+<option value="nutrição e dietética">Nutrição e Dietética</option>
 <option value="cardiopneumologia">Cardiopneumologia</option>
-<option value="medicina-dentaria">Medicina Dentária</option>
+<option value="medicina dentária">Medicina Dentária</option>
 </select>
 
 <button id="btnLogin" class="loginBtn" onclick="login()">Entrar</button>
@@ -135,12 +135,12 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } f
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
-  authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
-  projectId: "preparatoriovirtualcomdelta",
-  storageBucket: "preparatoriovirtualcomdelta.appspot.com",
-  messagingSenderId: "554101533814",
-  appId: "1:554101533814:web:ed46583d92f4e14679c357"
+  apiKey: "AIzaSyDoF_h5rVPvVFsHJNcXdWO1gkzwdm65pZQ",
+  authDomain: "preparatoriovirtualcomde-71e23.firebaseapp.com",
+  projectId: "preparatoriovirtualcomde-71e23",
+  storageBucket: "preparatoriovirtualcomde-71e23.firebasestorage.app",
+  messagingSenderId: "738659946479",
+  appId: "1:738659946479:web:882735f1e23b5d0764b01a"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -152,7 +152,7 @@ const loading = document.getElementById("loading");
 const btnLogin = document.getElementById("btnLogin");
 const btnRegister = document.getElementById("btnRegister");
 
-// área do index
+// 🔥 pegar área do index
 const params = new URLSearchParams(window.location.search);
 const areaURL = params.get("area");
 if(areaURL){
@@ -179,7 +179,7 @@ return false;
 return true;
 }
 
-// LOGIN
+// 🔐 LOGIN
 window.login = async function(){
 
 const email = document.getElementById("email").value;
@@ -195,17 +195,21 @@ showLoading();
 try {
 
 const userCredential = await signInWithEmailAndPassword(auth, email, senha);
-await verificar(userCredential.user);
+
+// 🔥 GARANTE QUE EXISTE NO FIRESTORE
+await garantirFirestore(userCredential.user, email, area);
+
+await verificar(userCredential.user, email);
 
 } catch(error){
-erro.innerText = "Email ou senha inválidos ou conta não existe";
+erro.innerText = "Email ou senha inválidos";
 } finally {
 hideLoading();
 }
 
 }
 
-// REGISTO
+// 🆕 REGISTO
 window.register = async function(){
 
 const email = document.getElementById("email").value;
@@ -222,10 +226,8 @@ try {
 
 const newUser = await createUserWithEmailAndPassword(auth, email, senha);
 
-const uid = newUser.user.uid;
-
-await setDoc(doc(db,"users",uid),{
-uid: uid,
+await setDoc(doc(db,"users",newUser.user.uid),{
+uid: newUser.user.uid,
 email: email,
 area: area,
 approved: false,
@@ -236,39 +238,54 @@ erro.style.color = "lightgreen";
 erro.innerText = "Conta criada! Aguarde aprovação do admin";
 
 } catch(error){
-erro.style.color = "red";
-erro.innerText = "Erro: " + error.message;
+erro.innerText = error.message;
 } finally {
 hideLoading();
 }
 
 }
 
-// VERIFICAÇÃO DE APROVAÇÃO
-async function verificar(user){
+// 🔥 GARANTE DOCUMENTO NO FIRESTORE
+async function garantirFirestore(user, email, area){
 
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 if(!snap.exists()){
-erro.innerText = "Conta não configurada";
+await setDoc(ref,{
+uid: user.uid,
+email: email,
+area: area,
+approved: false,
+createdAt: Date.now()
+});
+}
+
+}
+
+// 🔎 VERIFICAÇÃO
+async function verificar(user, email){
+
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+if(!snap.exists()){
+erro.innerText = "Erro no sistema";
 return;
 }
 
-const data = snap.data();
-
-if(!data.approved){
+if(snap.data().approved !== true){
 erro.innerText = "Aguardando aprovação do admin";
 return;
 }
 
-localStorage.setItem("user", user.email);
-localStorage.setItem("area", data.area);
+localStorage.setItem("user", email);
+localStorage.setItem("area", snap.data().area);
 
 window.location.href = "aulas.html";
 }
 
-// mostrar senha
+// 👁 senha
 window.toggleSenha = function(){
 const senha = document.getElementById("senha");
 senha.type = senha.type === "password" ? "text" : "password";
