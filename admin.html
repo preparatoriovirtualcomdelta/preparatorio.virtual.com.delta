@@ -8,105 +8,71 @@
 body{
 margin:0;
 font-family:Arial;
-background:linear-gradient(135deg,#0f172a,#1e293b,#0f172a);
+background:#0f172a;
 color:white;
-display:flex;
-justify-content:center;
-align-items:center;
-min-height:100vh;
-}
-
-/* LOGIN */
-.login{
 text-align:center;
-transform:scale(1.2);
 }
 
-input{
-padding:16px;
-margin:6px;
-border-radius:10px;
-border:none;
-font-size:16px;
-}
-
-button{
-padding:12px 20px;
-margin:6px;
-border:none;
-border-radius:10px;
-background:#22c55e;
-color:white;
-cursor:pointer;
-font-size:16px;
-transition:0.3s;
-}
-
-button:hover{
-transform:scale(1.05);
-}
-
-/* PAINEL */
 .container{
-display:none;
-width:95%;
-max-width:1300px;
-transform:scale(1.05);
+padding:20px;
 }
 
-/* CARDS */
 .card{
 background:#1e293b;
-padding:20px;
-margin:12px 0;
-border-radius:15px;
+padding:15px;
+margin:10px 0;
+border-radius:10px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-font-size:17px;
-box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* STATUS */
-.ok{background:#16a34a;padding:6px;border-radius:6px;}
-.no{background:#dc2626;padding:6px;border-radius:6px;}
-
-hr{
-margin:30px 0;
-border:1px solid #334155;
+button{
+padding:10px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:#22c55e;
+color:white;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div class="login" id="loginBox">
-<h2>Admin DELT∆</h2>
-<input type="password" id="senhaAdmin" placeholder="Senha"><br>
-<button onclick="entrar()">Entrar</button>
-<p id="erro" style="color:red;"></p>
-</div>
+<h2>ADMIN</h2>
 
-<!-- PAINEL -->
-<div class="container" id="painel">
+<div class="container">
 
-<h2>Alunos</h2>
+<h3>Usuários</h3>
 <div id="lista"></div>
 
 <hr>
 
-<h2>Upload de Aula</h2>
+<h3>Adicionar Aula</h3>
 
-<input type="text" id="titulo" placeholder="Título da aula"><br>
-<input type="file" id="ficheiro"><br>
+<input id="titulo" placeholder="Título"><br><br>
 
-<button onclick="upload()">Enviar Aula</button>
+<select id="tipo">
+<option value="video">Vídeo</option>
+<option value="pdf">PDF</option>
+<option value="imagem">Imagem</option>
+</select><br><br>
 
-<hr>
+<input id="url" placeholder="Link do conteúdo"><br><br>
 
-<h2>Comprovativos</h2>
-<div id="comprovativos"></div>
+<select id="area">
+<option value="medicina geral">Medicina Geral</option>
+<option value="enfermagem">Enfermagem</option>
+<option value="farmacia">Farmácia</option>
+<option value="analises clinicas">Análises Clínicas</option>
+<option value="fisioterapia">Fisioterapia</option>
+<option value="nutrição e dietética">Nutrição e Dietética</option>
+<option value="cardiopneumologia">Cardiopneumologia</option>
+<option value="medicina dentária">Medicina Dentária</option>
+</select><br><br>
+
+<button onclick="enviar()">Enviar Aula</button>
 
 </div>
 
@@ -114,41 +80,32 @@ border:1px solid #334155;
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuZ2kOWQ",
-  authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
-  projectId: "preparatoriovirtualcomdelta",
-  storageBucket: "preparatoriovirtualcomdelta.firebasestorage.app",
-  messagingSenderId: "554101533814",
-  appId: "1:554101533814:web:ed46583d92f4e14679c357"
+  apiKey: "AIzaSyDoF_h5rVPvVFsHJNcXdWO1gkzwdm65pZQ",
+  authDomain: "preparatoriovirtualcomde-71e23.firebaseapp.com",
+  projectId: "preparatoriovirtualcomde-71e23",
+  storageBucket: "preparatoriovirtualcomde-71e23.firebasestorage.app",
+  messagingSenderId: "738659946479",
+  appId: "1:738659946479:web:882735f1e23b5d0764b01a"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
-const SENHA = "12345678910xxxDelt∆xxxLoginwwwPermissãoFormulas17$";
+const SENHA = "123456";
 
-// LOGIN
-window.entrar = function(){
-const senha = document.getElementById("senhaAdmin").value;
-
-if(senha === SENHA){
-document.getElementById("loginBox").style.display="none";
-document.getElementById("painel").style.display="block";
-loadUsers();
-loadComprovativos();
-}else{
-document.getElementById("erro").innerText="Senha incorreta";
-}
+const pass = prompt("Senha admin:");
+if(pass !== SENHA){
+alert("Acesso negado");
+document.body.innerHTML="";
 }
 
-// USUÁRIOS
+// 🔥 LISTAR USUÁRIOS
 async function loadUsers(){
+
 const lista = document.getElementById("lista");
-lista.innerHTML="";
+lista.innerHTML = "";
 
 const snap = await getDocs(collection(db,"users"));
 
@@ -156,81 +113,58 @@ snap.forEach(docu=>{
 const data = docu.data();
 
 const div = document.createElement("div");
-div.className="card";
+div.className = "card";
 
-div.innerHTML=`
+div.innerHTML = `
 <div>
-<b>${data.email || "Sem email"}</b><br>
-<span class="${data.approved?'ok':'no'}">
-${data.approved?'APROVADO':'PENDENTE'}
-</span>
+${data.email}<br>
+${data.approved ? "APROVADO" : "PENDENTE"}
 </div>
 <button>Aprovar</button>
 `;
 
-div.querySelector("button").onclick=async()=>{
+div.querySelector("button").onclick = async ()=>{
 await updateDoc(doc(db,"users",docu.id),{
-approved:!data.approved
+approved: true
 });
 loadUsers();
 };
 
 lista.appendChild(div);
 });
+
 }
 
-// 🚀 UPLOAD COMPLETO (VIDEO + PDF + IMAGEM + ÁREA)
-window.upload = async function(){
+loadUsers();
 
-const file = document.getElementById("ficheiro").files[0];
+// 🚀 ENVIAR AULA
+window.enviar = async function(){
+
 const titulo = document.getElementById("titulo").value;
+const tipo = document.getElementById("tipo").value;
+const url = document.getElementById("url").value;
+const area = document.getElementById("area").value;
 
-if(!file || !titulo) return alert("Preencha tudo");
-
-// detectar tipo
-let tipo = "outro";
-if(file.type.includes("video")) tipo = "video";
-else if(file.type.includes("pdf")) tipo = "pdf";
-else if(file.type.includes("image")) tipo = "imagem";
-
-// escolher área
-const area = prompt("Área da aula (medicina, enfermagem, farmacia...)");
-
-if(!area) return alert("Área obrigatória");
-
-const storageRef = ref(storage, "aulas/" + Date.now() + "_" + file.name);
-
-await uploadBytes(storageRef, file);
-
-const url = await getDownloadURL(storageRef);
-
-// guardar no banco
-await addDoc(collection(db,"aulas"),{
-titulo: titulo,
-url: url,
-tipo: tipo,
-area: area.toLowerCase()
-});
-
-alert("Aula enviada com sucesso!");
+if(!titulo || !url){
+alert("Preencha tudo");
+return;
 }
 
-// COMPROVATIVOS
-async function loadComprovativos(){
+// 🔥 corrigir link de vídeo drive
+let finalURL = url;
 
-const div = document.getElementById("comprovativos");
-div.innerHTML="";
+if(tipo === "video" && url.includes("drive.google.com")){
+finalURL = url.replace("/view","/preview");
+}
 
-const snap = await getDocs(collection(db,"comprovativos"));
-
-snap.forEach(docu=>{
-const data = docu.data();
-
-const el = document.createElement("div");
-el.innerHTML = `<a href="${data.url}" target="_blank">Ver comprovativo</a><hr>`;
-
-div.appendChild(el);
+await addDoc(collection(db,"aulas"),{
+titulo,
+tipo,
+url: finalURL,
+area
 });
+
+alert("Aula enviada!");
 }
 
 </script>
