@@ -43,6 +43,16 @@ margin-top:5px;
 
 <h2>ADMIN DELT∆</h2>
 
+<!-- SENHA ADMIN -->
+<div class="box">
+<h3>Senha do Admin</h3>
+<input type="password" id="adminSenha" placeholder="Coloque a senha do admin">
+<button onclick="verificarSenha()">Entrar</button>
+<div id="senhaErro" style="color:red;margin-top:10px;"></div>
+</div>
+
+<div id="adminPainel" style="display:none;">
+
 <!-- UPLOAD AULAS -->
 <div class="box">
 <h3>Upload de Aulas</h3>
@@ -72,12 +82,15 @@ margin-top:5px;
 <div id="users"></div>
 </div>
 
+</div>
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
+// MESMO PROJETO DO LOGIN
 const firebaseConfig = {
 apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
 authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
@@ -91,10 +104,26 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
+const ADMIN_PASSWORD = "12345678910xxxDelt∆xxxLoginwwwPermissãoFormulas17$";
+
+// ===== SENHA ADMIN =====
+function verificarSenha(){
+const senha = document.getElementById("adminSenha").value;
+const erro = document.getElementById("senhaErro");
+
+if(senha !== ADMIN_PASSWORD){
+erro.innerText = "Senha incorreta!";
+return;
+}
+
+document.getElementById("adminPainel").style.display = "block";
+document.querySelector(".box").style.display = "none"; // esconder input senha
+carregarUsers();
+}
+
 // ===== USERS =====
 async function carregarUsers(){
 const snap = await getDocs(collection(db,"users"));
-
 const div = document.getElementById("users");
 div.innerHTML = "";
 
@@ -103,10 +132,9 @@ const d = u.data();
 
 div.innerHTML += `
 <div class="card">
-<p>${d.email}</p>
-<p>${d.area}</p>
-<p>${d.approved ? "APROVADO" : "PENDENTE"}</p>
-
+<p>Email: ${d.email}</p>
+<p>Área: ${d.area}</p>
+<p>Status: ${d.approved ? "APROVADO" : "PENDENTE"}</p>
 ${!d.approved ? `<button class="aprovar" onclick="aprovar('${u.id}')">Aprovar</button>` : ""}
 </div>
 `;
@@ -115,7 +143,7 @@ ${!d.approved ? `<button class="aprovar" onclick="aprovar('${u.id}')">Aprovar</b
 
 window.aprovar = async function(id){
 await updateDoc(doc(db,"users",id),{approved:true});
-alert("Aprovado!");
+alert("Usuário aprovado!");
 carregarUsers();
 }
 
@@ -127,15 +155,13 @@ const tipo = document.getElementById("tipo").value;
 const file = document.getElementById("file").files[0];
 const area = document.getElementById("area").value;
 
-if(!titulo || !file){
-alert("Preenche tudo");
+if(!titulo || !file || !area){
+alert("Preencha todos os campos");
 return;
 }
 
 const fileRef = ref(storage, tipo + "/" + Date.now() + "_" + file.name);
-
 await uploadBytes(fileRef, file);
-
 const url = await getDownloadURL(fileRef);
 
 await addDoc(collection(db,"aulas"),{
@@ -147,8 +173,6 @@ area
 
 alert("Aula enviada!");
 }
-
-carregarUsers();
 
 </script>
 
