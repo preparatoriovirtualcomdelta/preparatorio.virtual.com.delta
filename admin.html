@@ -2,101 +2,81 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>ADMIN - DELT∆</title>
+<title>ADMIN COMPLETO</title>
 
 <style>
 body{
 font-family:Arial;
 background:#0f172a;
 color:white;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-margin:0;
+padding:20px;
 }
 
 .box{
 background:#1e293b;
-padding:30px;
-border-radius:12px;
-width:350px;
-text-align:center;
+padding:15px;
+border-radius:10px;
+margin-bottom:20px;
 }
 
-input{
+input,select{
 width:100%;
-padding:12px;
-margin:10px 0;
-border-radius:8px;
-border:none;
+padding:10px;
+margin:5px 0;
 }
 
 button{
-width:100%;
-padding:12px;
+padding:10px;
 border:none;
 border-radius:8px;
-background:#3b82f6;
-color:white;
 cursor:pointer;
+margin-top:5px;
 }
 
-#error{
-color:red;
-margin-top:10px;
-}
-
-.hidden{
-display:none;
-}
-
-.card{
-background:#1e293b;
-padding:15px;
-margin:10px 0;
-border-radius:12px;
-}
-
-.aprovar{
-background:green;
-color:white;
-padding:8px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-}
+.aprovar{background:green;color:white;}
+.upload{background:#3b82f6;color:white;}
+.card{background:#111827;padding:10px;margin:10px 0;border-radius:10px;}
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN ADMIN -->
-<div class="box" id="loginBox">
+<h2>ADMIN DELT∆</h2>
 
-<h2>Admin Login</h2>
+<!-- UPLOAD AULAS -->
+<div class="box">
+<h3>Upload de Aulas</h3>
 
-<input type="password" id="senha" placeholder="Senha admin">
+<input id="titulo" placeholder="Título">
 
-<button onclick="entrar()">Entrar</button>
+<select id="tipo">
+<option value="video">Vídeo</option>
+<option value="pdf">PDF</option>
+<option value="imagem">Imagem</option>
+</select>
 
-<div id="error"></div>
+<input type="file" id="file">
 
+<select id="area">
+<option value="medicina geral">Medicina Geral</option>
+<option value="enfermagem">Enfermagem</option>
+<option value="farmacia">Farmácia</option>
+</select>
+
+<button class="upload" onclick="upload()">Enviar Aula</button>
 </div>
 
-<!-- PAINEL -->
-<div id="painel" class="hidden" style="width:80%;">
-
-<h2>Painel Admin</h2>
-
-<div id="lista"></div>
-
+<!-- USERS -->
+<div class="box">
+<h3>Usuários</h3>
+<div id="users"></div>
 </div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
@@ -109,64 +89,66 @@ appId: "1:554101533814:web:ed46583d92f4e14679c357"
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-const senhaCorreta = "12345678910xxxDelt∆xxxLoginwwwPermissãoFormulas17$";
-
-window.entrar = function(){
-
-const senha = document.getElementById("senha").value;
-
-if(senha !== senhaCorreta){
-document.getElementById("error").innerText = "Senha incorreta!";
-return;
-}
-
-document.getElementById("loginBox").style.display = "none";
-document.getElementById("painel").classList.remove("hidden");
-
-carregar();
-}
-
-const lista = document.getElementById("lista");
-
-async function carregar(){
-
-lista.innerHTML = "A carregar...";
-
+// ===== USERS =====
+async function carregarUsers(){
 const snap = await getDocs(collection(db,"users"));
 
-lista.innerHTML = "";
+const div = document.getElementById("users");
+div.innerHTML = "";
 
-snap.forEach((userDoc)=>{
+snap.forEach(u=>{
+const d = u.data();
 
-const data = userDoc.data();
-
-lista.innerHTML += `
+div.innerHTML += `
 <div class="card">
-<p><b>Email:</b> ${data.email}</p>
-<p><b>Área:</b> ${data.area}</p>
-<p><b>Status:</b> ${data.approved ? "✔ APROVADO" : "⏳ PENDENTE"}</p>
+<p>${d.email}</p>
+<p>${d.area}</p>
+<p>${d.approved ? "APROVADO" : "PENDENTE"}</p>
 
-${!data.approved ? `
-<button class="aprovar" onclick="aprovar('${userDoc.id}')">
-Aprovar
-</button>
-` : ""}
+${!d.approved ? `<button class="aprovar" onclick="aprovar('${u.id}')">Aprovar</button>` : ""}
 </div>
 `;
 });
-
 }
 
 window.aprovar = async function(id){
+await updateDoc(doc(db,"users",id),{approved:true});
+alert("Aprovado!");
+carregarUsers();
+}
 
-await updateDoc(doc(db,"users",id),{
-approved: true
+// ===== UPLOAD =====
+window.upload = async function(){
+
+const titulo = document.getElementById("titulo").value;
+const tipo = document.getElementById("tipo").value;
+const file = document.getElementById("file").files[0];
+const area = document.getElementById("area").value;
+
+if(!titulo || !file){
+alert("Preenche tudo");
+return;
+}
+
+const fileRef = ref(storage, tipo + "/" + Date.now() + "_" + file.name);
+
+await uploadBytes(fileRef, file);
+
+const url = await getDownloadURL(fileRef);
+
+await addDoc(collection(db,"aulas"),{
+titulo,
+tipo,
+url,
+area
 });
 
-alert("Usuário aprovado!");
-carregar();
+alert("Aula enviada!");
 }
+
+carregarUsers();
 
 </script>
 
