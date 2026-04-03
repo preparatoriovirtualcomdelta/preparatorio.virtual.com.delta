@@ -2,60 +2,81 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>ADMIN COMPLETO</title>
+<title>ADMIN DELT∆</title>
 
 <style>
 body{
 font-family:Arial;
 background:#0f172a;
 color:white;
-padding:20px;
+margin:0;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
 }
 
 .box{
 background:#1e293b;
-padding:15px;
+padding:20px;
 border-radius:10px;
-margin-bottom:20px;
+width:400px;
+text-align:center;
 }
 
 input,select{
 width:100%;
 padding:10px;
-margin:5px 0;
+margin:8px 0;
+border-radius:6px;
+border:none;
 }
 
 button{
+width:100%;
 padding:10px;
 border:none;
-border-radius:8px;
+border-radius:6px;
 cursor:pointer;
-margin-top:5px;
 }
 
-.aprovar{background:green;color:white;}
-.upload{background:#3b82f6;color:white;}
-.card{background:#111827;padding:10px;margin:10px 0;border-radius:10px;}
+.loginBtn{background:#3b82f6;color:white;}
+.uploadBtn{background:#22c55e;color:white;}
+.aprovar{background:green;color:white;margin-top:5px;}
+
+.hidden{display:none;}
+
+.card{
+background:#111827;
+padding:10px;
+margin:10px 0;
+border-radius:8px;
+}
 </style>
 </head>
 
 <body>
 
-<h2>ADMIN DELT∆</h2>
+<!-- LOGIN ADMIN -->
+<div class="box" id="loginBox">
 
-<!-- SENHA ADMIN -->
-<div class="box">
-<h3>Senha do Admin</h3>
-<input type="password" id="adminSenha" placeholder="Coloque a senha do admin">
-<button onclick="verificarSenha()">Entrar</button>
-<div id="senhaErro" style="color:red;margin-top:10px;"></div>
+<h2>Admin Login</h2>
+
+<input type="password" id="senha" placeholder="Senha admin">
+<button class="loginBtn" onclick="entrar()">Entrar</button>
+
+<p id="erro" style="color:red"></p>
+
 </div>
 
-<div id="adminPainel" style="display:none;">
+<!-- PAINEL -->
+<div id="painel" class="hidden" style="width:80%;">
 
-<!-- UPLOAD AULAS -->
+<h2>PAINEL ADMIN</h2>
+
+<!-- UPLOAD -->
 <div class="box">
-<h3>Upload de Aulas</h3>
+<h3>Upload Aulas</h3>
 
 <input id="titulo" placeholder="Título">
 
@@ -73,7 +94,7 @@ margin-top:5px;
 <option value="farmacia">Farmácia</option>
 </select>
 
-<button class="upload" onclick="upload()">Enviar Aula</button>
+<button class="uploadBtn" onclick="upload()">Enviar Aula</button>
 </div>
 
 <!-- USERS -->
@@ -90,7 +111,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, getDocs, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-// MESMO PROJETO DO LOGIN
 const firebaseConfig = {
 apiKey: "AIzaSyBPx6l8JDNFfi70-DgRBvWk4mhuQz2kOWQ",
 authDomain: "preparatoriovirtualcomdelta.firebaseapp.com",
@@ -104,41 +124,48 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-const ADMIN_PASSWORD = "12345678910xxxDelt∆xxxLoginwwwPermissãoFormulas17$";
+// 🔐 SENHA ORIGINAL
+const senhaAdmin = "12345678910xxxDelt∆xxxLoginwwwPermissãoFormulas17$";
 
-// ===== SENHA ADMIN =====
-function verificarSenha(){
-const senha = document.getElementById("adminSenha").value;
-const erro = document.getElementById("senhaErro");
+// LOGIN ADMIN
+window.entrar = function(){
 
-if(senha !== ADMIN_PASSWORD){
-erro.innerText = "Senha incorreta!";
+const s = document.getElementById("senha").value;
+
+if(s !== senhaAdmin){
+document.getElementById("erro").innerText = "Senha incorreta!";
 return;
 }
 
-document.getElementById("adminPainel").style.display = "block";
-document.querySelector(".box").style.display = "none"; // esconder input senha
+document.getElementById("loginBox").style.display = "none";
+document.getElementById("painel").classList.remove("hidden");
+
 carregarUsers();
 }
 
-// ===== USERS =====
+// USERS
 async function carregarUsers(){
+
 const snap = await getDocs(collection(db,"users"));
+
 const div = document.getElementById("users");
 div.innerHTML = "";
 
 snap.forEach(u=>{
+
 const d = u.data();
 
 div.innerHTML += `
 <div class="card">
-<p>Email: ${d.email}</p>
-<p>Área: ${d.area}</p>
-<p>Status: ${d.approved ? "APROVADO" : "PENDENTE"}</p>
+<p>${d.email}</p>
+<p>${d.area}</p>
+<p>${d.approved ? "APROVADO" : "PENDENTE"}</p>
+
 ${!d.approved ? `<button class="aprovar" onclick="aprovar('${u.id}')">Aprovar</button>` : ""}
 </div>
 `;
 });
+
 }
 
 window.aprovar = async function(id){
@@ -147,7 +174,7 @@ alert("Usuário aprovado!");
 carregarUsers();
 }
 
-// ===== UPLOAD =====
+// UPLOAD
 window.upload = async function(){
 
 const titulo = document.getElementById("titulo").value;
@@ -155,13 +182,15 @@ const tipo = document.getElementById("tipo").value;
 const file = document.getElementById("file").files[0];
 const area = document.getElementById("area").value;
 
-if(!titulo || !file || !area){
-alert("Preencha todos os campos");
+if(!titulo || !file){
+alert("Preenche tudo");
 return;
 }
 
 const fileRef = ref(storage, tipo + "/" + Date.now() + "_" + file.name);
+
 await uploadBytes(fileRef, file);
+
 const url = await getDownloadURL(fileRef);
 
 await addDoc(collection(db,"aulas"),{
